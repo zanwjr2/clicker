@@ -3557,17 +3557,18 @@ body {
 
 .victory-era-panel {
   position: relative;
-  min-height: 270px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  min-height: 285px;
+  display: grid;
+  grid-template-columns: 28% minmax(0, 1fr);
+  align-items: stretch;
   overflow: hidden;
   border-bottom: 1px solid var(--border-subtle);
   text-align: left;
+  background: radial-gradient(circle at 85% 20%, var(--era-halo), transparent 65%), var(--era-dark);
 }
 .victory-illustration {
-  position: absolute;
-  inset: 0;
+  grid-column: 1;
+  min-height: 285px;
   background-color: var(--era-dark);
   background-image: url('./assets/chronicle-eras.webp');
   background-repeat: no-repeat;
@@ -3576,18 +3577,20 @@ body {
 }
 .victory-era-panel::after {
   position: absolute;
-  inset: 20% 0 0;
+  inset: 0;
   content: '';
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 0%, rgba(5, 10, 23, 0.88) 100%);
+  background: linear-gradient(90deg, transparent 18%, rgba(5, 10, 23, .28) 30%, transparent 85%);
 }
 .victory-art-caption {
   position: relative;
   z-index: 1;
+  grid-column: 2;
+  align-self: center;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 35px 25px 24px;
+  gap: 12px;
+  padding: 28px 32px;
   text-shadow: 0 2px 8px #020617;
 }
 .victory-art-caption span {
@@ -3597,7 +3600,7 @@ body {
   letter-spacing: 1px;
 }
 .victory-art-caption strong {
-  font-size: 24px;
+  font-size: clamp(20px, 3vw, 30px);
   font-weight: 900;
   color: #fff;
 }
@@ -3624,8 +3627,9 @@ body {
 .victory-story .victory-epilogue { border-top: 1px solid var(--border-subtle); padding-top: 12px; color: var(--accent-gold-soft); }
 .victory-note { text-align: center; }
 @media (max-width: 600px) {
-  .victory-era-panel { min-height: 235px; }
-  .victory-art-caption { padding: 30px 16px 17px; }
+  .victory-era-panel { min-height: 235px; grid-template-columns: 40% minmax(0, 1fr); }
+  .victory-illustration { min-height: 235px; }
+  .victory-art-caption { gap: 7px; padding: 22px 14px; }
   .victory-art-caption strong { font-size: 20px; }
   .victory-detail { padding: 16px 15px 20px; }
 }
