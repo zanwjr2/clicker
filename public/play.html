@@ -49,19 +49,6 @@
     <div class="shell">
       <aside class="sidebar">
         <div class="sidebar-top">
-          <div class="profile">
-            <div class="avatar">⚔️</div>
-            <div class="profile-copy">
-              <small>탐사단 지휘관</small>
-              <strong>신입 탐사자</strong>
-              <span>LV.<b id="sideLevel">1</b> <i class="rank-dot"></i> <span id="rankText">견습</span></span>
-            </div>
-            <div class="xp-bar-wrap">
-              <div class="xp-mini"><span>EXP</span><span id="xpMini">0 / 650</span></div>
-              <div class="level-track"><div class="level-fill" id="levelFill"></div></div>
-            </div>
-          </div>
-
           <div class="nav-caption">빠른 메뉴</div>
           <nav class="main-nav" id="nav">
             <button class="nav-item selected" data-nav="battle"><span>⚔</span> 전투 <b>PLAY</b></button>
@@ -211,6 +198,14 @@
 
               <div class="stats-card panel">
                 <div class="panel-head"><span>탐사자 상태</span><small class="online-chip">LIVE</small></div>
+                <div class="player-level" aria-label="레벨 및 경험치">
+                  <div class="player-level-head">
+                    <div class="player-level-identity"><span class="player-level-icon" aria-hidden="true">⚔</span><span class="player-level-name">탐사자 성장</span></div>
+                    <div class="player-level-rank"><span>LV.<b id="sideLevel">1</b></span><strong id="rankText">견습</strong></div>
+                  </div>
+                  <div class="xp-mini"><span>경험치</span><span id="xpMini">0 / 650</span></div>
+                  <div class="level-track"><div class="level-fill" id="levelFill"></div></div>
+                </div>
                 <div class="player-health"><span>탐사자 체력</span><strong id="playerHpText">120 / 120</strong></div>
                 <div class="player-health-bar"><div id="playerHpFill"></div></div>
                 <div class="stats-summary-grid">
