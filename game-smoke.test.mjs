@@ -236,8 +236,9 @@ for (const [index, [age, weapon, icon, firstMission]] of eras.entries()) {
   victory.click('action', 'attack');
   assert.equal(victory.state().awaitingNext, true);
   assert.match(victory.view('modalRoot'), /victory-era-panel/);
+  assert.match(victory.view('modalRoot'), /victory-illustration/);
+  assert.match(victory.view('modalRoot'), /이번 임무의 결말/);
   assert.match(victory.view('modalRoot'), new RegExp(age));
-  assert.doesNotMatch(victory.view('modalRoot'), /victory-.*\.webp/);
   assert.match(victory.view('modalRoot'), /modal-rewards/);
   assert.match(victory.view('modalRoot'), /다음 미션으로/);
   const reloadedVictory = harness(victory.state());

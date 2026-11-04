@@ -10,7 +10,16 @@ const FIELDS = ["clicks", "kills", "runClicks", "runKills", "progress", "selecte
   "caravan", "caravanCount", "runCaravanCount", "keys", "lastSupplyAt",
   "combatAuthority"];
 
+function clearedMissions(state: Record<string, unknown>) {
+  if (Array.isArray(state.clearedMissions)) return state.clearedMissions;
+  // Trusted old saves predate the per-mission ledger. Their contiguous progress
+  // is the only history they can legitimately import on their first new save.
+  const count = Math.min(140, Math.max(0, Math.floor(Number(state.progress) || 0)));
+  return Array.from({ length: count }, (_, i) => i);
+}
+
 export function hasServerOwnedChanges(before: Record<string, unknown>, after: Record<string, unknown>) {
+  if (JSON.stringify(clearedMissions(before)) !== JSON.stringify(clearedMissions(after))) return true;
   if (FIELDS.some(key => JSON.stringify(after[key] ?? null) !==
     JSON.stringify(before[key] ?? null))) return true;
   const oldPrestige = (before.prestige || {}) as Record<string, unknown>;

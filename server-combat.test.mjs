@@ -247,14 +247,15 @@ test('a burst stops at the victory boundary without granting extra attacks or re
   assert.equal(browser.serverState().kills, 1);
   assert.equal(browser.serverState().awaitingNext, true);
   assert.equal(browser.networkActions().filter(([action]) => action === 'attackBurst').length, 1);
-  assert.match(browser.view('modalRoot'), /개척 성공/);
+  assert.match(browser.view('modalRoot'), /victory-illustration/);
+  assert.match(browser.view('modalRoot'), /이번 임무의 결말/);
 });
 
-test('unlocked mission selection is server-owned and locked missions are rejected', () => {
+test('all 140 missions are selectable for free and stage selection remains server-owned', () => {
   const base = starter();
   base.progress = 20;
   base.enemyHp = 609;
-  assert.equal(resolveServerAction(base, {type:'selectMission', id:21}, NOW).code, 'mission-locked');
+  assert.equal(resolveServerAction(base, {type:'selectMission', id:21}, NOW).ok, true);
   assert.equal(resolveServerAction(base, {type:'selectMission', id:140}, NOW).ok, false);
   assert.equal(resolveServerAction(base, {type:'selectMission', id:'9'}, NOW).ok, false);
   assert.equal(hasServerOwnedChanges(base, {...base, selectedMission:9}), true,
@@ -265,10 +266,49 @@ test('unlocked mission selection is server-owned and locked missions are rejecte
   assert.equal(selected.selectedMission, 9);
   assert.equal(selected.enemyHp, 2304, 'selected chapter boss has the correct HP');
   assert.equal(selected.missionEntered, false);
+  assert.equal(selected.stamina, base.stamina, 'selection must not charge stamina');
   const returned = doAction(selected, 'selectMission', NOW + 100, 20);
   assert.equal(returned.selectedMission, null);
   assert.equal(returned.progress, 20);
   assert.equal(returned.enemyHp, 609);
+});
+
+test('stamina is paid once at explicit start, and nonsequential wins have a one-time clear record', () => {
+  const base = starter();
+  base.progress = 3;
+  const chosen = doAction(base, 'selectMission', NOW, 139);
+  assert.equal(chosen.stamina, base.stamina);
+  assert.equal(chosen.selectedMission, 139);
+  assert.equal(chosen.missionEntered, false);
+  assert.equal(hasServerOwnedChanges(base, { ...base, clearedMissions:[139] }), true,
+    'the client cannot invent a completed boss stage');
+
+  const started = doAction(chosen, 'startMission', NOW + 100);
+  assert.equal(started.missionEntered, true);
+  assert.equal(started.stamina, chosen.stamina - 8);
+  assert.equal(started.clicks, chosen.clicks, 'starting is not an attack');
+  assert.equal(resolveServerAction(started, {type:'startMission'}, NOW + 150).ok, false,
+    'repeated starts must not restart a paid mission');
+
+  started.enemyHp = 1;
+  const beaten = doAction(started, 'attack', NOW + 200);
+  assert.equal(beaten.lastVictory.replay, false);
+  assert.ok(beaten.clearedMissions.includes(139));
+  assert.equal(beaten.clearedMissions.filter(id => id === 139).length, 1);
+  assert.equal(beaten.progress, 3, 'clearing a future boss does not skip unfinished stages');
+  const advanced = doAction(beaten, 'next', NOW + 300);
+  assert.equal(advanced.progress, 3);
+  assert.equal(advanced.selectedMission, null);
+
+  const replayStage = doAction(advanced, 'selectMission', NOW + 400, 139);
+  assert.equal(replayStage.stamina, advanced.stamina);
+  replayStage.enemyHp = 1;
+  const replay = doAction(replayStage, 'attack', NOW + 500);
+  assert.equal(replay.lastVictory.replay, true);
+  assert.equal(replay.lastVictory.shard, 0);
+  assert.equal(replay.lastVictory.foundGear, null);
+  assert.equal(replay.lastVictory.foundKey, false);
+  assert.equal(replay.clearedMissions.filter(id => id === 139).length, 1);
 });
 
 test('replayed chapter bosses pay reduced rewards, no repeat relic, and preserve unlocked stages', () => {
@@ -307,9 +347,10 @@ test('mission browser displays fourteen chapters, boss endings and selectable cl
   assert.equal(browser.serverState().selectedMission, 9);
   assert.equal(browser.serverState().progress, 20);
   assert.equal(browser.text('chapterName'), '불을 지키는 사람들');
-  browser.click('action', 'attack');
+  browser.click('action', 'startMission');
   await browser.settle();
   assert.equal(browser.serverState().missionEntered, true);
+  assert.equal(browser.serverState().clicks, 0, 'explicit start does not attack');
   browser.click('nav', 'chapters');
   browser.click('browse-chapter', '2');
   browser.click('select-mission', '20');

@@ -202,7 +202,7 @@
     chestsOpened: 'runChestsOpened', moduleResearch: 'runModuleResearch', caravanCount: 'runCaravanCount' };
   const TUTORIAL_VERSION = 1;
   const TUTORIAL_STEPS = [
-    { icon: '🪓', title: '첫 공격', text: '석제 도끼 버튼을 세 번 눌러 위협을 물리치세요. 시대가 변하면 무기도 진화해요. Space 키로도 공격할 수 있어요.', tab: 'battle', target: '[data-action="attack"]', metric: 'runClicks', count: 3, progressLabel: '공격' },
+    { icon: '🪓', title: '첫 공격', text: '먼저 「선택한 미션 시작」을 누른 뒤 석제 도끼로 세 번 공격하세요. 미션 선택은 무료이고 실제 시작할 때만 스태미너가 차감됩니다. Space 키로도 공격할 수 있어요.', tab: 'battle', target: '[data-action="startMission"]', metric: 'runClicks', count: 3, progressLabel: '공격' },
     { icon: GOLD_ICON, title: '채집과 스태미너', text: '채집으로 금화를 모아 보세요. 미션 시작 시 스태미너가 한 번 차감되고, 기본 90초마다 1씩 회복돼요. 레벨마다 최대치가 2 증가합니다.', tab: 'battle', target: '[data-action="gather"]', metric: 'tutorialGathers', count: 1, progressLabel: '채집' },
     { icon: '🔧', title: '상점 이용', text: '상점 · 장비 강화에서 추천·전투·스태미너·자원 분류를 골라 원하는 강화를 구매하세요.', tab: 'shop', target: '[data-buy="blade"]', metric: 'runPurchases', count: 1, progressLabel: '강화 구매' },
     { icon: '🎁', title: '첫 전리품', text: '장비·상자 탭에서 시작 보급상자를 열어 장비를 획득하세요. 얻은 장비는 자동 장착할 수 있어요.', tab: 'inventory', target: '[data-chest="bronze"]', metric: 'runChestsOpened', count: 1, progressLabel: '상자 개봉' },
@@ -216,7 +216,7 @@
   const fmt = n => !Number.isFinite(Number(n)) ? '0' : Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 }).format(Math.floor(n));
   const today = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
   const defaultState = () => ({
-    saveFormat:2, theme: 'evolution', gold: 500, essence: 0, shards: 0, level: 1, xp: 0, progress: 0, selectedMission: null, enemyHp: 320, playerHp: 120,
+    saveFormat:2, theme: 'evolution', gold: 500, essence: 0, shards: 0, level: 1, xp: 0, progress: 0, selectedMission: null, clearedMissions: [], enemyHp: 320, playerHp: 120,
     stamina:STAMINA.base, staminaUpdatedAt:Date.now(), missionEntered:false, lastSupplyAt:0,
     clicks: 0, kills: 0, purchases: 0, runClicks: 0, runKills: 0, runPurchases: 0,
     runChestsOpened: 0, runModuleResearch: 0, runCaravanCount: 0, arenaWins: 0, questIndex: 0, items: {}, helpers: {}, achievements: [],
@@ -243,9 +243,6 @@
     };
     merged.gold = Math.max(0, Number(merged.gold) || 0);
     merged.progress = Math.max(0, Math.floor(Number(merged.progress) || 0));
-    merged.selectedMission = Number.isSafeInteger(raw.selectedMission) &&
-      raw.selectedMission >= 0 && raw.selectedMission < merged.progress &&
-      raw.selectedMission < CHAPTERS.length * MISSIONS_PER_CHAPTER ? raw.selectedMission : null;
     if (Number(raw.saveFormat || 1) < 2) {
       const oldChapter = Math.floor(merged.progress / 7), oldMission = merged.progress % 7;
       merged.progress = oldChapter < 7
@@ -253,6 +250,11 @@
         : 140 + (oldChapter - 7) * MISSIONS_PER_CHAPTER + Math.floor(oldMission * MISSIONS_PER_CHAPTER / 7);
       merged.missionEntered = false;
     }
+    const cleared = new Set(Array.isArray(raw.clearedMissions) ? raw.clearedMissions.filter(i => Number.isSafeInteger(i) && i >= 0 && i < 140) : []);
+    for (let i = 0; i < Math.min(140, merged.progress); i++) cleared.add(i);
+    merged.clearedMissions = [...cleared].sort((a, b) => a - b);
+    merged.selectedMission = Number.isSafeInteger(raw.selectedMission) &&
+      raw.selectedMission >= 0 && raw.selectedMission < CHAPTERS.length * MISSIONS_PER_CHAPTER ? raw.selectedMission : null;
     merged.saveFormat = 2;
     merged.stamina = clamp(Number(merged.stamina) || 0, 0, 10000);
     merged.staminaUpdatedAt = Number.isFinite(Number(merged.staminaUpdatedAt)) ? Number(merged.staminaUpdatedAt) : Date.now();
@@ -283,7 +285,9 @@
   let lastRender = 0;
   const theme = () => THEMES[s.theme];
   const activeStage = () => s.selectedMission == null ? s.progress : s.selectedMission;
-  const isReplay = () => s.selectedMission != null && s.selectedMission < s.progress;
+  const wasCleared = target => target < s.progress || s.clearedMissions.includes(target);
+  const clearedCount = chapterId => s.clearedMissions.filter(i => Math.floor(i / MISSIONS_PER_CHAPTER) === chapterId).length;
+  const isReplay = () => s.awaitingNext ? !!s.lastVictory?.replay : wasCleared(activeStage());
   const missionIndex = () => activeStage() % MISSIONS_PER_CHAPTER;
   const chapterIndex = () => Math.floor(activeStage() / MISSIONS_PER_CHAPTER);
   const unlockedChapter = () => Math.floor(s.progress / MISSIONS_PER_CHAPTER);
@@ -521,7 +525,7 @@
         if (serverDirty) await syncServer();
         if (serverDirty || serverBlocked) throw new Error('unsaved changes');
         const previous = { level:s.level, progress:s.progress, selectedMission:s.selectedMission, awaitingNext:s.awaitingNext,
-          battleOver:s.battleOver, inventory:s.inventory, arenaWins:s.arenaWins };
+          battleOver:s.battleOver, inventory:s.inventory, arenaWins:s.arenaWins, replay:!!s.lastVictory?.replay, stage:activeStage() };
         const response = await fetch(gameApiUrl(), {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: type, id, revision: serverRevision }),
@@ -570,14 +574,15 @@
           openModal('defeat', `<span class="modal-crest">🩸</span><h2>작전 중단</h2><p>체력이 소진되었거나 제한 시간이 끝났습니다. 재도전해 주세요.</p><div class="modal-actions"><button data-action="retry">다시 도전하기</button></div>`);
         if (type === 'next') {
           closeModal();
-          if (previous.selectedMission != null) toast('재도전 완료! 최고 진행 미션으로 복귀했습니다.', true);
-          else if (chapterIndex() !== Math.floor(previous.progress / MISSIONS_PER_CHAPTER)) chapterStoryModal();
+          if (previous.replay) toast('재도전 완료! 다른 미션도 자유롭게 선택할 수 있습니다.', true);
+          else if (chapterIndex() !== Math.floor(previous.stage / MISSIONS_PER_CHAPTER)) chapterStoryModal();
           else setStatus('다음 작전 준비 완료', missionStory()[0]);
         }
         if (type === 'selectMission') {
           closeModal(); navigate('battle');
-          toast(isReplay() ? '재도전 준비 완료 · 첫 공격에 스태미너가 소모됩니다.' : '선택한 미션으로 이동했습니다.', true);
+          toast('미션 선택 완료 · 스태미너 소모 0 · 시작할 때만 차감', true);
         }
+        if (type === 'startMission') toast('⚔ 작전 개시! 스태미너가 한 번 차감됐습니다.', true);
         if (type === 'retry') closeModal();
         if (type === 'doPrestige') {
           closeModal(); navigate('prestige');
@@ -886,12 +891,15 @@
   function victoryContent(result = null) {
     const boss = missionIndex() === 9;
     const replay = !!result?.replay || isReplay();
-    const headline = boss ? chapterTitle() + ' 돌파!' : '개척 성공!';
-    const summary = missionStory()[2] + (boss ? '<br><br>' + chapter().epilogue : '');
+    const title = missionStory()[0];
+    const summary = missionStory()[2];
+    const eraArt = eraIndex();
+    const artX = (eraArt % 4) * 100 / 3;
+    const artY = Math.floor(eraArt / 4) * 100;
     const rewards = result
       ? `<div class="modal-rewards"><span><span class="gold-icon" aria-label="금화">G</span> ${fmt(result.gold)} 금화</span><span>✨ ${fmt(result.xp)} XP</span><span>🔮 ${result.essence} 마력</span>${result.shard ? `<span>💎 유물 +${result.shard}</span>` : ''}${result.foundKey ? '<span>🗝️ 상자 열쇠 +1</span>' : ''}${result.foundGear ? `<span>${result.foundGear.icon} ${result.foundGear.rank} 장비</span>` : ''}</div>`
       : '<div class="modal-rewards"><span>✓ 전리품이 이미 지급되었습니다</span></div>';
-    return `<div class="victory-era-panel"><div class="victory-era-icon">${chapter().scene}</div><span>CHAPTER ${String(chapterIndex()+1).padStart(2,'0')} · ${era().age}</span><strong>${chapterTitle()}</strong><small>${chapter().period} · 문명 진화 연대기</small></div><div class="victory-detail"><div class="modal-overline">${replay ? 'REPLAY COMPLETE · 재도전 성공' : 'MISSION ' + String(missionIndex()+1).padStart(2, '0') + ' / ' + MISSIONS_PER_CHAPTER + ' COMPLETE'}</div><h2>${headline}</h2><p>${summary}${replay ? '<br>재도전 보상은 25%이며 보스 유물·장비·열쇠는 중복 지급되지 않습니다.' : ''}${result?.speedBonus > 1 ? '<br>⏱ 속전 보너스 +40% 달성!' : ''}</p>${rewards}<div class="modal-actions"><button data-action="next">${replay ? '원래 진행 미션으로 →' : boss ? '다음 챕터로 →' : '다음 미션으로 →'}</button></div></div>`;
+    return `<div class="victory-era-panel"><div class="victory-illustration" style="--art-x:${artX}%;--art-y:${artY}%" role="img" aria-label="${era().age}의 문명 일러스트"></div><div class="victory-art-caption"><span>CHAPTER ${String(chapterIndex()+1).padStart(2, '0')} · ${era().age}</span><strong>${chapterTitle()}</strong><small>✦ ${chapter().period} · 승리의 연대기</small></div></div><div class="victory-detail"><div class="modal-overline">${replay ? 'REPLAY COMPLETE · 재도전 성공' : 'MISSION ' + String(missionIndex()+1).padStart(2, '0') + ' / ' + MISSIONS_PER_CHAPTER + ' COMPLETE'}</div><h2>${title}</h2><div class="victory-story"><strong>📜 ${boss ? '챕터의 결말' : '이번 임무의 결말'}</strong><p>${summary}</p>${boss ? `<p class="victory-epilogue">${chapter().epilogue}</p>` : ''}</div>${replay ? '<p class="victory-note">↻ 재도전 보상은 25%이며 보스 유물·장비·열쇠는 중복 지급되지 않습니다.</p>' : ''}${result?.speedBonus > 1 ? '<p class="victory-note">⏱ 속전 보너스 +40% 달성!</p>' : ''}${rewards}<div class="modal-actions"><button data-action="next">${replay ? '자유 선택 화면으로 →' : activeStage() >= 139 ? '다음 여정을 준비하기 →' : boss ? '다음 챕터로 →' : '다음 미션으로 →'}</button></div></div>`;
   }
   function winMission() {
     if (s.awaitingNext) return;
@@ -908,6 +916,14 @@
     if (!replay && missionIndex() === 9) s.stamina = Math.min(maxStamina(), s.stamina + 12);
     xpGain(xp);
     s.lastVictory = { gold, xp, essence, shard, foundKey, foundGear: foundGear ? { icon: foundGear.icon, rank: foundGear.rank } : null, speedBonus, replay };
+    if (!replay && activeStage() < 140 && !s.clearedMissions.includes(activeStage())) {
+      s.clearedMissions.push(activeStage());
+      s.clearedMissions.sort((a, b) => a - b);
+    }
+    if (!replay && activeStage() < 140 && !s.clearedMissions.includes(activeStage())) {
+      s.clearedMissions.push(activeStage());
+      s.clearedMissions.sort((a, b) => a - b);
+    }
     persist(); render();
     openModal('victory', victoryContent(s.lastVictory));
   }
@@ -918,19 +934,25 @@
   }
   function advance() {
     if (!s.awaitingNext) return;
-    const pastChapter = chapterIndex(), replay = isReplay();
-    if (!replay) s.progress++;
-    s.selectedMission = null; s.lastVictory = null; s.enemyHp = missionMax(); s.playerHp = Math.max(Math.ceil(maxHp() * .65), Math.min(maxHp(), s.playerHp + maxHp() * (.3 + .04 * (s.items.vitality || 0))));
+    const pastChapter = chapterIndex(), finished = activeStage(), frontier = s.progress, replay = !!s.lastVictory?.replay;
+    if (!replay) {
+      if (finished >= 140 && s.selectedMission == null) s.progress++;
+      else while (s.progress < 140 && s.clearedMissions.includes(s.progress)) s.progress++;
+    }
+    const continueAhead = !replay && finished > frontier && finished + 1 < 140;
+    s.selectedMission = continueAhead && finished + 1 !== s.progress ? finished + 1 : null;
+    s.lastVictory = null; s.enemyHp = missionMax(); s.playerHp = Math.max(Math.ceil(maxHp() * .65), Math.min(maxHp(), s.playerHp + maxHp() * (.3 + .04 * (s.items.vitality || 0))));
     s.awaitingNext = false; s.battleOver = false; s.timer = speedLimit(); s.timerStarted = false; s.missionEntered = false;
     closeModal(); persist(); render();
-    if (replay) toast('재도전 완료! 현재 진행 미션으로 복귀했습니다.', true);
-    else if (chapterIndex() !== pastChapter) { toast('새 챕터 해금! ' + chapterTitle()); setStatus('문명의 새로운 장', chapter().prologue); chapterStoryModal(); }
+    if (replay) toast('재도전 완료! 다른 미션도 자유롭게 선택할 수 있습니다.', true);
+    else if (chapterIndex() !== pastChapter) { toast('새 챕터로 이동! ' + chapterTitle()); setStatus('문명의 새로운 장', chapter().prologue); chapterStoryModal(); }
     else setStatus('다음 작전 준비 완료', '새 작전: ' + missionStory()[0]);
   }
   function selectMission(target, confirmed = false) {
-    if (!Number.isSafeInteger(target) || target < 0 || target > s.progress || target >= CHAPTERS.length * MISSIONS_PER_CHAPTER) {
-      toast('아직 해금되지 않은 미션입니다.'); return;
+    if (!Number.isSafeInteger(target) || target < 0 || target >= CHAPTERS.length * MISSIONS_PER_CHAPTER) {
+      toast('존재하지 않는 미션입니다.'); return;
     }
+    if (s.awaitingNext) { openModal('victory', victoryContent(s.lastVictory)); return; }
     if (serverReady && (serverActionsPending || serverSaving)) { toast('서버 전투 판정이 끝난 후 선택해 주세요.'); return; }
     if (target === activeStage()) {
       closeModal(); navigate('battle');
@@ -946,13 +968,13 @@
     }
     pendingMissionTarget = null;
     if (serverReady) { serverAction('selectMission', target); return; }
-    s.selectedMission = target < s.progress ? target : null;
+    s.selectedMission = target === s.progress ? null : target;
     s.enemyHp = missionMax(); s.playerHp = maxHp();
     s.lastVictory = null; s.awaitingNext = false; s.battleOver = false;
     s.missionEntered = false; s.timerStarted = false; s.timer = speedLimit();
     helperRemainder = 0; enemyAttackRemainder = 0; timerRemainder = 0;
     closeModal(); persist(); navigate('battle');
-    toast(isReplay() ? '재도전 준비 완료 · 첫 공격 시 스태미너 소모' : '미션 선택 완료', true);
+    toast('미션 선택 완료 · 스태미너 소모 0 · 시작할 때만 차감', true);
   }
   function retry() { s.enemyHp = missionMax(); s.playerHp = maxHp(); s.battleOver = false; s.timer = speedLimit(); s.timerStarted = false; s.missionEntered = false; closeModal(); persist(); render(); }
   function chapterTitle() { return chapterIndex() < CHAPTERS.length ? chapter().name : '성간 개척 · 제' + (chapterIndex() - CHAPTERS.length + 2) + '성계'; }
@@ -997,7 +1019,10 @@
     const supplyRemaining = Math.max(0, STAMINA.supplyCooldownMs - (Date.now() - s.lastSupplyAt));
     $('staminaSupply').textContent = supplyRemaining ? '🏕️ 보급 대기 ' + Math.ceil(supplyRemaining / 60000) + '분' : '🏕️ 야영 보급 +' + campAmount() + ' · ' + fmt(supplyCost()) + ' 금화';
     $('staminaSupply').disabled = s.stamina >= maxStamina() || supplyRemaining > 0 || s.gold < supplyCost();
-    $('attackButton').disabled = !adminMode && !s.missionEntered && s.stamina < staminaCost() || s.awaitingNext || s.battleOver || adminMode && !serverReady;
+    $('startMissionButton').textContent = s.missionEntered ? '✓ 미션 진행 중 · 스태미너 추가 소모 없음' : '▶ 선택한 미션 시작 · ⚡' + staminaCost() + ' 소모';
+    $('startMissionButton').disabled = s.missionEntered || s.awaitingNext || s.battleOver || (!adminMode || !serverReady) && s.stamina < staminaCost();
+    $('startMissionButton').classList.toggle('mission-started', s.missionEntered);
+    $('attackButton').disabled = !s.missionEntered || s.awaitingNext || s.battleOver || adminMode && !serverReady;
   }
   function renderCombatLive() {
     const enraged = missionIndex() === 9 && s.enemyHp / missionMax() <= .35 && !s.awaitingNext;
@@ -1033,10 +1058,10 @@
     $('pageEyebrow').textContent = 'CHAPTER ' + String(c + 1).padStart(2, '0') + ' / OPERATION ' + String(i + 1).padStart(2, '0');
     $('pageTitle').textContent = chapterTitle() + ' · ' + storyline[0];
     $('pageSubtitle').textContent = s.awaitingNext ? storyline[2] : storyline[1];
-    $('missionBadge').innerHTML = info.type + ' 임무 <span>● ' + (s.awaitingNext ? '완료' : isReplay() ? '재도전 중' : '진행 중') + '</span><em>LV.' + s.level + ' · 숙련 공격 +' + (masteryTier() * 10) + '%</em>';
+    $('missionBadge').innerHTML = info.type + ' 임무 <span>● ' + (s.awaitingNext ? '완료' : s.missionEntered ? '전투 진행 중' : '시작 대기') + '</span><em>LV.' + s.level + ' · 숙련 공격 +' + (masteryTier() * 10) + '%</em>';
     $('worldLabel').textContent = 'CH.' + (c + 1) + ' · ' + t.age + ' · ' + ep.period;
     $('chapterName').textContent = chapterTitle(); $('chapterNum').textContent = String(c + 1).padStart(2, '0');
-    $('chapterProgress').textContent = Math.max(0, Math.min(MISSIONS_PER_CHAPTER, s.progress - c * MISSIONS_PER_CHAPTER)) + ' / ' + MISSIONS_PER_CHAPTER + ' 완료';
+    $('chapterProgress').textContent = clearedCount(c) + ' / ' + MISSIONS_PER_CHAPTER + ' 완료';
     $('chapterReward').textContent = '보스 추가 금화 ' + fmt(Math.floor(600 * Math.pow(BALANCE.chapterGold, c) * goldMulti())) + ' · 유물 ' + (1 + (chapterRule().shard || 0)) + '개';
     $('chapterTrait').textContent = '✧ ' + chapterRule().name + ' · ' + chapterRule().detail;
     $('chapterStory').innerHTML = `<span>${ep.scene} 챕터 스토리</span><strong>${ep.prologue}</strong><small>${t.age} 이야기 읽기 ↗</small>`;
@@ -1044,10 +1069,9 @@
     if ($('missionList').dataset.signature !== missionSignature) {
       $('missionList').innerHTML = MISSION_TYPES.map((m, index) => {
         const target = c * MISSIONS_PER_CHAPTER + index;
-        const completed = target < s.progress || target === s.progress && s.awaitingNext;
+        const completed = wasCleared(target);
         const active = target === activeStage();
-        const unlocked = target <= s.progress;
-        return `<button class="mission-item ${completed ? 'complete' : ''} ${active ? 'active' : ''} ${index === 9 ? 'boss-mission' : ''}" ${unlocked ? '' : 'disabled'} data-select-mission="${target}" title="${unlocked ? (completed ? '재도전 · 보상 25%' : '현재 미션') : '이전 미션을 클리어하면 해금'} · ${m.role}"><span class="mission-index">${index === 9 ? '♛' : String(index + 1).padStart(2, '0')}</span><span class="mission-copy"><strong>${ep.missions[index][0]}</strong><small>${index === 9 ? 'BOSS · 챕터 결전' : m.tag + ' · ' + m.role.split(' · ')[0]}</small></span><span class="mission-mark">${active ? '◉' : completed ? '✔' : '🔒'}</span></button>`;
+        return `<button class="mission-item ${completed ? 'complete' : ''} ${active ? 'active' : ''} ${index === 9 ? 'boss-mission' : ''}" data-select-mission="${target}" title="${completed ? '재도전 · 보상 25%' : '자유 선택 가능 · 입장 무료'} · ${m.role}"><span class="mission-index">${index === 9 ? '♛' : String(index + 1).padStart(2, '0')}</span><span class="mission-copy"><strong>${ep.missions[index][0]}</strong><small>${index === 9 ? 'BOSS · 챕터 결전' : m.tag + ' · ' + m.role.split(' · ')[0]}</small></span><span class="mission-mark">${active ? '◉' : completed ? '✔' : '↗'}</span></button>`;
       }).join('');
       $('missionList').dataset.signature = missionSignature;
     }
@@ -1104,23 +1128,20 @@
   function renderChapters() {
     chapterBrowserIndex = clamp(chapterBrowserIndex, 0, CHAPTERS.length - 1);
     const selected = CHAPTERS[chapterBrowserIndex], ch = chapterBrowserIndex;
-    const finished = Math.max(0, Math.min(MISSIONS_PER_CHAPTER, s.progress - ch * MISSIONS_PER_CHAPTER));
-    const reached = ch <= unlockedChapter();
-    const totalFinished = Math.min(CHAPTERS.length * MISSIONS_PER_CHAPTER, s.progress);
+    const finished = clearedCount(ch);
+    const totalFinished = s.clearedMissions.length;
     const chapterButtons = CHAPTERS.map((item, index) => {
-      const cleared = s.progress >= (index + 1) * MISSIONS_PER_CHAPTER;
-      const opened = index <= unlockedChapter();
-      return `<button type="button" class="chapter-pick ${chapterBrowserIndex === index ? 'selected' : ''} ${cleared ? 'cleared' : ''}" data-browse-chapter="${index}" aria-pressed="${chapterBrowserIndex === index}"><span class="chapter-pick-icon">${opened ? item.scene : '🔒'}</span><span><small>CHAPTER ${String(index + 1).padStart(2, '0')} · ${ERAS[item.era].age}</small><strong>${item.name}</strong></span><em>${cleared ? '완료 ✓' : opened ? Math.max(0, s.progress - index * 10) + '/10' : '잠김'}</em></button>`;
+      const completed = clearedCount(index);
+      return `<button type="button" class="chapter-pick ${chapterBrowserIndex === index ? 'selected' : ''} ${completed === 10 ? 'cleared' : ''}" data-browse-chapter="${index}" aria-pressed="${chapterBrowserIndex === index}"><span class="chapter-pick-icon">${item.scene}</span><span><small>CHAPTER ${String(index + 1).padStart(2, '0')} · ${ERAS[item.era].age}</small><strong>${item.name}</strong></span><em>${completed === 10 ? '완료 ✓' : completed + '/10'}</em></button>`;
     }).join('');
     const missionCards = selected.missions.map((story, index) => {
       const stage = ch * MISSIONS_PER_CHAPTER + index;
-      const cleared = stage < s.progress;
-      const playable = stage <= s.progress;
+      const cleared = wasCleared(stage);
       const focused = stage === activeStage();
       const boss = index === MISSIONS_PER_CHAPTER - 1;
-      return `<article class="chapter-mission-card ${boss ? 'boss' : ''} ${cleared ? 'cleared' : ''} ${focused ? 'focused' : ''} ${playable ? '' : 'locked'}"><div class="chapter-mission-top"><span class="chapter-mission-num">${boss ? '♛ BOSS' : String(index + 1).padStart(2, '0')}</span><span class="chapter-mission-state">${focused ? '● 선택 중' : cleared ? '✓ 클리어' : playable ? '● 도전 가능' : '🔒 미해금'}</span></div><h3>${story[0]}</h3><small>${boss ? '챕터 최종 보스전' : MISSION_TYPES[index].type + ' · ' + MISSION_TYPES[index].tag}</small><p>${playable ? story[1] : '이전 미션을 클리어하면 스토리가 공개됩니다.'}</p><button type="button" data-select-mission="${stage}" ${playable ? '' : 'disabled'}>${focused ? '전투 화면으로 →' : cleared ? '↻ 재도전 · 보상 25%' : '⚔ 미션 선택 →'}</button></article>`;
+      return `<article class="chapter-mission-card ${boss ? 'boss' : ''} ${cleared ? 'cleared' : ''} ${focused ? 'focused' : ''}"><div class="chapter-mission-top"><span class="chapter-mission-num">${boss ? '♛ BOSS' : String(index + 1).padStart(2, '0')}</span><span class="chapter-mission-state">${focused ? '● 선택 중' : cleared ? '✓ 클리어' : '● 자유 도전'}</span></div><h3>${story[0]}</h3><small>${boss ? '챕터 최종 보스전' : MISSION_TYPES[index].type + ' · ' + MISSION_TYPES[index].tag}</small><p>${story[1]}</p><button type="button" data-select-mission="${stage}">${focused ? '전투 화면으로 →' : cleared ? '↻ 재도전 · 보상 25%' : '⚔ 무료로 미션 선택 →'}</button></article>`;
     }).join('');
-    $('secondaryView').innerHTML = `<section class="chapter-browser secondary"><div class="chapter-browser-summary"><div><span class="section-label">EXPEDITION MAP / 문명의 연대기</span><h2>챕터 · 미션 선택</h2><p>원시 시대부터 우주 개척까지 · 14개 챕터 · 140개 미션</p></div><strong>${totalFinished}<small> / 140 완료</small></strong></div><div class="chapter-browser-layout"><nav class="chapter-picker" aria-label="챕터 목록">${chapterButtons}</nav><div class="chapter-browser-detail"><div class="chapter-detail-hero"><span class="chapter-detail-scene">${selected.scene}</span><div><small>CHAPTER ${String(ch + 1).padStart(2, '0')} · ${selected.period}</small><h2>${selected.name}</h2><p>${reached ? selected.prologue : '아직 도달하지 못한 시대입니다. 이전 챕터의 보스를 클리어하면 해금됩니다.'}</p><span class="chapter-detail-progress">${finished} / 10 미션 클리어 · ${finished === 10 ? '챕터 완료 ✓' : reached ? '진행 중' : '미개척'}</span></div></div><div class="chapter-browser-guide">${reached ? '⚔ 해금한 미션을 선택하면 전투 화면으로 이동합니다. 첫 입장 공격 시 스태미너가 소모됩니다.' : '🔒 이전 챕터의 보스전을 클리어하면 이 챕터를 플레이할 수 있습니다.'}<br>↻ 재도전은 금화·경험치 25%와 마력 1만 획득하며 보스 전용 유물·장비·열쇠는 중복 지급되지 않습니다.</div><div class="chapter-mission-grid">${missionCards}</div></div></div></section>`;
+    $('secondaryView').innerHTML = `<section class="chapter-browser secondary"><div class="chapter-browser-summary"><div><span class="section-label">EXPEDITION MAP / 문명의 연대기</span><h2>챕터 · 미션 선택</h2><p>원시 시대부터 우주 개척까지 · 14개 챕터 · 140개 미션 전체 자유 선택</p></div><strong>${totalFinished}<small> / 140 완료</small></strong></div><div class="chapter-browser-layout"><nav class="chapter-picker" aria-label="챕터 목록">${chapterButtons}</nav><div class="chapter-browser-detail"><div class="chapter-detail-hero"><span class="chapter-detail-scene">${selected.scene}</span><div><small>CHAPTER ${String(ch + 1).padStart(2, '0')} · ${selected.period}</small><h2>${selected.name}</h2><p>${selected.prologue}</p><span class="chapter-detail-progress">${finished} / 10 미션 클리어 · ${finished === 10 ? '챕터 완료 ✓' : '자유 도전 가능'}</span></div></div><div class="chapter-browser-guide">⚔ 어떤 챕터의 미션이든 무료로 선택할 수 있습니다. <b>전투 화면의 '미션 시작' 버튼을 눌렀을 때만</b> 스태미너가 한 번 소모됩니다.<br>↻ 이미 클리어한 미션은 금화·경험치 25%와 마력 1만 획득하며 보스 유물·장비·열쇠는 중복 지급되지 않습니다. 처음 클리어한 임무는 별도로 기록됩니다.</div><div class="chapter-mission-grid">${missionCards}</div></div></div></section>`;
   }
   function renderShop() {
     const hitsPerSecond = (attack() + dps()) * armorReduction();
@@ -1153,8 +1174,8 @@
     $('secondaryView').innerHTML = `<div class="secondary"><div class="secondary-header"><p>가상의 상대와 전투력을 겨뤄 단계별 보상을 획득합니다.</p><span class="section-count">현재 ${s.arenaWins}승</span></div><div class="arena-layout"><div class="arena-card arena-stage"><div class="modal-overline">SIMULATION ARENA / RANK ${s.arenaWins + 1}</div><span class="arena-opponent">${['🦹','🤺','👹','🐲'][s.arenaWins % 4]}</span><strong>${['그림자 검사','황혼의 결투자','폐허의 집행자','심연의 용기사'][s.arenaWins % 4]}</strong><small>적 예상 전투력 ${fmt(opponentPower)}</small></div><div class="arena-card arena-info"><h3>⚔️ 모의 투기장</h3><p>나의 전투력: <b style="color:var(--primary)">${fmt(power())}</b><br>적의 전투력: <b>${fmt(opponentPower)}</b><br>참가 조건: 레벨 3 이상<br>승리 보상: 금화, 마력<br>경기 간 대기 시간: 30초</p><button class="purchase-button" data-action="arenaFight" ${s.level < 3 || wait ? 'disabled' : ''}>${s.level < 3 ? '레벨 3에 해금' : wait ? wait + '초 대기 중' : '전투 시작'}</button></div></div><div class="notice-box">이 모드는 현재 NPC와 벌이는 싱글플레이 모의전입니다. 실시간 다른 유저와 대결하는 멀티플레이 아레나는 추후 서버 연동이 필요합니다.</div></div>`;
   }
   function renderCodex() {
-    const unlocked = Math.max(0, Math.min(MISSIONS_PER_CHAPTER, s.progress - chapterIndex() * MISSIONS_PER_CHAPTER + (s.awaitingNext && !isReplay() ? 1 : 0)));
-    $('secondaryView').innerHTML = `<div class="secondary"><div class="secondary-header"><p>${era().age} · ${chapterTitle()}에 등장하는 적과 사건 기록입니다.</p><span class="section-count">${unlocked}/${MISSIONS_PER_CHAPTER}개 기록</span></div><div class="codex-grid">${MISSION_TYPES.map((m, i) => { const known = unlocked >= i + 1, story = chapter().missions[i]; return `<article class="codex-card ${known ? '' : 'locked'}"><div class="codex-sprite">${known ? era().emoji[[0,1,2,3,4,5,3,1,4,6][i]] : '❔'}</div><h3>${known ? story[0] : '미발견 미션'}</h3><small>${known ? m.tag + ' / 기록 완료' : '스토리 해금 전'}</small><p>${known ? story[2] : '해당 작전을 클리어하면 결말이 공개됩니다.'}</p></article>`; }).join('')}</div><div class="section-label">문명 연대기 · ${CHAPTERS.length}개 챕터</div><div class="era-chronicle">${CHAPTERS.map((ch,i) => `<article class="chronicle-era ${i <= unlockedChapter() ? 'reached' : ''}"><span>${ch.scene}</span><strong>CH.${i+1} ${ch.name}</strong><small>${ERAS[ch.era].age} · ${ch.period}</small><button class="tiny-btn" data-chapter-story="${i}" ${i > unlockedChapter() ? 'disabled' : ''}>${i > unlockedChapter() ? '미개척' : '이야기 보기'}</button></article>`).join('')}</div></div>`;
+    const recorded = clearedCount(chapterIndex());
+    $('secondaryView').innerHTML = `<div class="secondary"><div class="secondary-header"><p>${era().age} · ${chapterTitle()}에 등장하는 적과 사건 기록입니다.</p><span class="section-count">${recorded}/${MISSIONS_PER_CHAPTER}개 기록</span></div><div class="codex-grid">${MISSION_TYPES.map((m, i) => { const known = wasCleared(chapterIndex() * MISSIONS_PER_CHAPTER + i), story = chapter().missions[i]; return `<article class="codex-card ${known ? '' : 'locked'}"><div class="codex-sprite">${known ? era().emoji[[0,1,2,3,4,5,3,1,4,6][i]] : '❔'}</div><h3>${known ? story[0] : '미발견 미션'}</h3><small>${known ? m.tag + ' / 기록 완료' : '스토리 해금 전'}</small><p>${known ? story[2] : '해당 작전을 클리어하면 결말이 공개됩니다.'}</p></article>`; }).join('')}</div><div class="section-label">문명 연대기 · ${CHAPTERS.length}개 챕터</div><div class="era-chronicle">${CHAPTERS.map((ch,i) => `<article class="chronicle-era ${clearedCount(i) ? 'reached' : ''}"><span>${ch.scene}</span><strong>CH.${i+1} ${ch.name}</strong><small>${ERAS[ch.era].age} · ${ch.period}</small><button class="tiny-btn" data-chapter-story="${i}">이야기 보기</button></article>`).join('')}</div></div>`;
   }
   function renderInventory() {
     const slots = ['weapon', 'armor', 'relic'];
@@ -1304,7 +1325,7 @@
       const titles = { chapters: ['챕터 · 미션 선택', 'CHAPTERS / MISSION SELECT'], shop: ['상점 · 장비 강화', 'SHOP / UPGRADES'], helpers: ['동료 관리', 'EXPEDITION / CREW'], inventory: ['장비와 보급상자', 'INVENTORY / LOOT'], modules: ['기술 연구소', 'TECHNOLOGY / CHRONICLE'], quests: ['임무와 업적', 'MISSIONS / ACHIEVEMENTS'], arena: ['모의 투기장', 'ARENA / SIMULATION'], expedition: ['특수 작전과 파견', 'SPECIAL / CARAVANS'], prestige: ['프레스티지 계승', 'ASCENSION / LEGACY'], codex: ['탐사 도감', 'ARCHIVE / DISCOVERIES'], leaderboard: ['전투력 리더보드', 'GLOBAL / HALL OF EXPLORERS'] };
       const [title, eyebrow] = titles[activeTab];
       $('pageEyebrow').textContent = eyebrow; $('pageTitle').textContent = title;
-      $('pageSubtitle').textContent = activeTab === 'chapters' ? '해금한 미션을 자유롭게 선택하고 챕터 최종 보스에 도전하세요.' : activeTab === 'shop' ? '금화로 전투력과 스태미너를 강화하세요.' : activeTab === 'leaderboard' ? '최고 전투력을 겨루는 탐사자들의 기록입니다.' : '탐사단을 성장시켜 더 강한 적과 새로운 지역에 도전하세요.';
+      $('pageSubtitle').textContent = activeTab === 'chapters' ? '140개 미션을 제한 없이 선택하세요. 선택은 무료이며 시작 시 스태미너가 소모됩니다.' : activeTab === 'shop' ? '금화로 전투력과 스태미너를 강화하세요.' : activeTab === 'leaderboard' ? '최고 전투력을 겨루는 탐사자들의 기록입니다.' : '탐사단을 성장시켜 더 강한 적과 새로운 지역에 도전하세요.';
       $('missionBadge').innerHTML = 'LV. ' + s.level + ' <span>● 활동 중</span>';
       if (activeTab === 'leaderboard') {
         if (window.ERA_ACCOUNT_UI) window.ERA_ACCOUNT_UI.renderLeaderboard($('secondaryView'));
@@ -1319,22 +1340,20 @@
   function closeModal() { modal = ''; $('modalRoot').classList.add('hidden'); $('modalRoot').innerHTML = ''; renderTutorial(); }
   function eraStoryModal(index = eraIndex()) {
     const e = ERAS[clamp(index, 0, ERAS.length - 1)];
-    const opened = index <= unlockedEraIndex();
-    if (!opened) return;
-    const finish = index < unlockedEraIndex() || (index === unlockedEraIndex() && missionIndex() === 9 && s.awaitingNext && !isReplay());
+    const finish = CHAPTERS.some((chapter, chIndex) => chapter.era === index && wasCleared(chIndex * MISSIONS_PER_CHAPTER + MISSIONS_PER_CHAPTER - 1));
     openModal('story', `<span class="modal-crest">${e.scene}</span><div class="modal-overline">CHAPTER ${String(index + 1).padStart(2, '0')} / ${e.period}</div><h2>${e.age} · ${e.name}</h2><p>${e.story}</p><div class="story-weapon">${e.weapon.icon} 이 시대의 무기: <strong>${e.weapon.name}</strong> · ${e.weapon.action}</div>${finish ? `<p class="story-epilogue">${e.ending}</p>` : ''}<div class="modal-actions"><button data-action="close">${index === eraIndex() ? '이 시대 개척하기' : '연대기로 돌아가기'}</button></div>`);
   }
   function chapterStoryModal(index = chapterIndex()) {
-    if (index > unlockedChapter() || index < 0 || index >= CHAPTERS.length) return;
-    const ch = CHAPTERS[index], unlocked = s.progress >= (index + 1) * MISSIONS_PER_CHAPTER || (index === unlockedChapter() && s.awaitingNext && missionIndex() === 9 && !isReplay());
+    if (index < 0 || index >= CHAPTERS.length) return;
+    const ch = CHAPTERS[index], unlocked = wasCleared(index * MISSIONS_PER_CHAPTER + MISSIONS_PER_CHAPTER - 1);
     openModal('story', `<span class="modal-crest">${ch.scene}</span><div class="modal-overline">CHAPTER ${String(index+1).padStart(2,'0')} / ${ch.period} · ${ERAS[ch.era].age}</div><h2>${ch.name}</h2><p class="story-intro">${ch.prologue}</p><div class="story-weapon">${ch.weapon.icon} 이번 챕터의 무기: <strong>${ch.weapon.name}</strong> · ${ch.weapon.action}</div>${unlocked ? `<p class="story-epilogue">${ch.epilogue}</p>` : ''}<div class="modal-actions"><button data-action="close">${index === chapterIndex() ? '챕터 진행하기' : '연대기로 돌아가기'}</button></div>`);
   }
   function missionStoryModal() {
     const story = missionStory();
-    openModal('story', `<span class="modal-crest">📜</span><div class="modal-overline">CH.${String(chapterIndex()+1).padStart(2,'0')} / MISSION ${String(missionIndex()+1).padStart(2,'0')} OF ${MISSIONS_PER_CHAPTER}</div><h2>${story[0]}</h2><p class="story-intro">${chapter().prologue}</p><div class="story-incident"><strong>이번 사건</strong><p>${story[1]}</p></div>${s.awaitingNext ? `<div class="story-epilogue"><strong>결말</strong><p>${story[2]}</p></div>` : `<div class="story-locked">🔒 결말은 미션을 완료하면 공개됩니다.</div>`}<div class="modal-actions"><button data-action="close">${s.awaitingNext ? '결과 확인' : '작전으로 돌아가기 · 스태미너 ' + staminaCost() + ' 소모'}</button></div>`);
+    openModal('story', `<span class="modal-crest">📜</span><div class="modal-overline">CH.${String(chapterIndex()+1).padStart(2,'0')} / MISSION ${String(missionIndex()+1).padStart(2,'0')} OF ${MISSIONS_PER_CHAPTER}</div><h2>${story[0]}</h2><p class="story-intro">${chapter().prologue}</p><div class="story-incident"><strong>이번 사건</strong><p>${story[1]}</p></div>${wasCleared(activeStage()) ? `<div class="story-epilogue"><strong>결말</strong><p>${story[2]}</p></div>` : `<div class="story-locked">🔒 결말은 미션을 완료하면 공개됩니다.</div>`}<div class="modal-actions"><button data-action="close">작전으로 돌아가기 · 스태미너 소모 없음</button></div>`);
   }
   function introModal() { openModal('intro', `<span class="modal-crest">🌄</span><div class="modal-overline">PROLOGUE / FROM STONE TO STARS</div><h2>돌에서 별까지</h2><p>우리는 아직 이름 없는 작은 부족입니다.<br>밤을 밝히는 것은 희미한 불씨 하나, 손에 쥔 것은 돌도끼 한 자루뿐.<br><br>불을 지키고, 도시를 세우고, 철과 증기를 발명하세요.<br>컴퓨터와 미래 기술을 넘어 인류를 별의 바다로 이끄세요.<br><br>7개 시대, 14개 챕터, 140개 미션에 이어지는 이야기가 기다립니다.</p><div class="modal-actions"><button data-action="begin">인류의 연대기 시작 🪓</button></div>`); }
-  function settingsModal() { openModal('settings', `<span class="modal-overline">CHRONICLE SETTINGS</span><h2>문명 진화 연대기</h2><p>원시 시대에서 우주 개척까지 일곱 시대를 여행합니다. 시대마다 무기·적·스토리가 달라집니다.<br>최고 해금 <b>챕터 ${unlockedChapter()+1}</b> · 현재 플레이 <b>${era().age}</b></p><div class="theme-select">${ERAS.map((e,i) => `<button class="theme-option ${i === eraIndex() ? 'selected' : ''}" data-era-story="${i}" ${i > unlockedEraIndex() ? 'disabled' : ''}><span>${e.scene}</span><strong>${e.age}</strong></button>`).join('')}</div><div class="modal-actions"><button class="modal-secondary" data-action="help">게임 설명</button><button class="modal-secondary" data-action="restartTutorial">🎓 튜토리얼 시작</button><button data-action="close">닫기</button></div><div class="modal-danger-zone"><button class="modal-secondary modal-danger-link" data-action="confirmReset">모든 진행 상황 초기화</button></div>`); }
+  function settingsModal() { openModal('settings', `<span class="modal-overline">CHRONICLE SETTINGS</span><h2>문명 진화 연대기</h2><p>원시 시대에서 우주 개척까지 일곱 시대를 여행합니다. 시대마다 무기·적·스토리가 달라집니다.<br>클리어 <b>${s.clearedMissions.length}/140개</b> · 현재 플레이 <b>${era().age}</b></p><div class="theme-select">${ERAS.map((e,i) => `<button class="theme-option ${i === eraIndex() ? 'selected' : ''}" data-era-story="${i}"><span>${e.scene}</span><strong>${e.age}</strong></button>`).join('')}</div><div class="modal-actions"><button class="modal-secondary" data-action="help">게임 설명</button><button class="modal-secondary" data-action="restartTutorial">🎓 튜토리얼 시작</button><button data-action="close">닫기</button></div><div class="modal-danger-zone"><button class="modal-secondary modal-danger-link" data-action="confirmReset">모든 진행 상황 초기화</button></div>`); }
   function testToolsModal() {
     const status = adminMode ? '🛠 관리자 테스트 모드' : '🔒 일반 플레이 모드';
     const modeButton = adminAvailable
@@ -1351,7 +1370,7 @@
     if (serverDirty || serverBlocked || serverSaving) { toast('저장이 완료되지 않아 모드를 전환하지 않았습니다.'); return; }
     window.location.assign(enter ? '/play.html?mode=admin' : '/play.html');
   }
-  function helpModal() { openModal('help', `<span class="modal-crest">📖</span><div class="modal-overline">HOW TO PLAY</div><h2>문명 개척 가이드</h2><p style="text-align:left">① <b>전투</b>에서 시대별 무기 버튼을 눌러 공격합니다. (Space)<br>② 미션 첫 공격에만 <b>스태미너</b>를 소모합니다. 기본 90초마다 1 회복, 재도전 시 입장 비용이 다시 발생합니다.<br>③ <b>상점 · 장비 강화</b>의 스태미너 분류에서 회복 체계와 행군 효율을 구매할 수 있습니다.<br>④ <b>야영 보급</b>은 금화로 스태미너를 보충하며 10분간 재사용 대기합니다.<br>⑤ 매 레벨업마다 최대 스태미너 +2, 공격력 +2, 최대 체력 +10이 적용됩니다.<br>⑥ 총 14챕터·140미션에 시작 사건과 클리어 후 결말이 있습니다.<br>⑦ <b>기술 연구</b>는 시간이 지나 완료되고, 프레스티지 후에도 유지됩니다.<br>⑧ 나머지 기능은 상단 <b>더보기</b>에서 찾을 수 있습니다. 상점의 일반 강화는 프레스티지 시 초기화됩니다.<br>⑨ 서버 저장에 연결되지 않으면 브라우저에 백업됩니다.</p><div class="modal-actions"><button class="modal-secondary" data-action="restartTutorial">🎓 직접 따라하기</button><button data-action="close">확인</button></div>`); }
+  function helpModal() { openModal('help', `<span class="modal-crest">📖</span><div class="modal-overline">HOW TO PLAY</div><h2>문명 개척 가이드</h2><p style="text-align:left">① <b>챕터 · 미션 선택</b>에서 140개 미션 중 원하는 미션을 무료로 고릅니다. 순서 제한은 없습니다.<br>② <b>선택한 미션 시작</b> 버튼을 누르는 순간에만 스태미너가 한 번 차감됩니다. 이후 시대별 무기 버튼으로 공격합니다. (Space)<br>③ 스태미너는 기본 90초마다 1 회복되며, 새 전투를 시작할 때는 다시 입장 비용이 발생합니다.<br>④ <b>상점 · 장비 강화</b>에서 회복 체계와 행군 효율을 구매하거나 금화로 야영 보급을 사용할 수 있습니다.<br>⑤ 매 레벨업마다 최대 스태미너 +2, 공격력 +2, 최대 체력 +10이 적용됩니다.<br>⑥ 모든 미션에는 사건과 <b>클리어 후 공개되는 일러스트·결말</b>이 있으며 최초 클리어를 개별 기록합니다.<br>⑦ <b>기술 연구</b>는 시간이 지나 완료되고 프레스티지 후에도 유지됩니다.<br>⑧ 나머지 기능은 상단 <b>더보기</b>에서 찾을 수 있습니다. 상점의 일반 강화는 프레스티지 시 초기화됩니다.<br>⑨ 서버 저장에 연결되지 않으면 브라우저에 백업됩니다.</p><div class="modal-actions"><button class="modal-secondary" data-action="restartTutorial">🎓 직접 따라하기</button><button data-action="close">확인</button></div>`); }
   function resetConfirm() { openModal('reset', `<span class="modal-crest">⚠️</span><h2>${adminMode ? '테스트 데이터' : '내 계정'} 초기화</h2><p>${adminMode ? '관리자 테스트 저장 데이터만' : '일반 계정의 레벨, 재화, 장비, 미션과 리더보드 전투력까지'} 초기화됩니다.<br>복구할 수 없습니다. 정말 초기화할까요?</p><div class="modal-actions"><button class="modal-secondary" data-action="testTools">취소</button><button class="modal-danger-btn" data-action="reset">초기화 확인</button></div>`); }
   async function resetProgress() {
     if (serverActionsPending || serverSaving) { toast('진행 중인 서버 작업이 끝난 후 초기화해 주세요.'); return; }
@@ -1416,7 +1435,7 @@
     const caravanBtn = event.target.closest('[data-caravan]'); if (caravanBtn) { if (serverReady) serverAction('launchCaravan', Number(caravanBtn.dataset.caravan)); else launchCaravan(Number(caravanBtn.dataset.caravan)); return; }
     const th = event.target.closest('[data-theme-pick]'); if (th) { changeTheme(th.dataset.themePick); return; }
     const btn = event.target.closest('[data-action]'); if (!btn) return;
-    const authoritative = { attack:'attack', heal:'heal', gather:'gather', skill:'skill',
+    const authoritative = { startMission:'startMission', attack:'attack', heal:'heal', gather:'gather', skill:'skill',
       next:'next', retry:'retry', claimQuest:'claimQuest', daily:'claimDaily',
       arenaFight:'arenaFight', campSupply:'campSupply', claimCaravan:'claimCaravan',
       startSpecial:'startSpecial', strikeSpecial:'strikeSpecial', claimEvent:'claimEvent',
@@ -1425,6 +1444,7 @@
       serverAction(authoritative[btn.dataset.action]); return;
     }
     switch (btn.dataset.action) {
+      case 'startMission': if (startMission()) render(); break;
       case 'attack': actAttack(); break; case 'heal': actHeal(); break; case 'gather': actGather(); break; case 'skill': actSkill(); break;
       case 'confirmMissionSelect': if (pendingMissionTarget != null) selectMission(pendingMissionTarget, true); break;
       case 'next': advance(); break; case 'retry': retry(); break; case 'claimQuest': claimQuest(); break;

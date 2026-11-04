@@ -1316,6 +1316,25 @@ body {
   gap: 9px;
 }
 
+/* 선택은 무료, 출정 순간에만 스태미너를 사용한다. */
+.mission-start-button {
+  width: 100%;
+  padding: 13px 12px;
+  border: 1px solid rgba(56, 189, 248, 0.58);
+  border-radius: var(--radius-md);
+  color: #f0f9ff;
+  font-weight: 850;
+  font-size: 14px;
+  background: linear-gradient(110deg, #0369a1, #1d4ed8);
+  box-shadow: 0 5px 16px rgba(2, 132, 199, 0.2);
+  cursor: pointer;
+}
+.mission-start-button:hover:not(:disabled) { filter: brightness(1.12); }
+.mission-start-button:disabled { opacity: 0.55; cursor: not-allowed; }
+.mission-start-button.mission-started { background: #134e4a; border-color: #0d9488; }
+.mission-start-hint { text-align: center; color: var(--text-sub); font-size: 11px; line-height: 1.5; }
+.attack-button:disabled { filter: grayscale(0.6); opacity: 0.52; cursor: not-allowed; }
+
 /* 와이드 공격 버튼 */
 .attack-button {
   width: 100%;
@@ -3530,53 +3549,85 @@ body {
 }
 
 .victory-modal {
-  width: min(640px, 100%);
+  width: min(760px, 100%);
   max-height: 92vh;
   padding: 0;
   overflow: auto;
 }
 
 .victory-era-panel {
-  min-height: 185px;
+  position: relative;
+  min-height: 270px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 24px 20px;
-  background:
-    radial-gradient(circle at 50% 35%, var(--era-halo), transparent 65%),
-    linear-gradient(160deg, var(--era-dark), var(--bg-base));
+  justify-content: flex-end;
+  overflow: hidden;
   border-bottom: 1px solid var(--border-subtle);
-  text-align: center;
+  text-align: left;
 }
-
-.victory-era-panel .victory-era-icon {
-  font-size: 68px;
-  line-height: 1.1;
+.victory-illustration {
+  position: absolute;
+  inset: 0;
+  background-color: var(--era-dark);
+  background-image: url('./assets/chronicle-eras.webp');
+  background-repeat: no-repeat;
+  background-position: var(--art-x, 0%) var(--art-y, 0%);
+  background-size: 400% 200%;
 }
-
-.victory-era-panel span {
+.victory-era-panel::after {
+  position: absolute;
+  inset: 20% 0 0;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(5, 10, 23, 0.88) 100%);
+}
+.victory-art-caption {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 35px 25px 24px;
+  text-shadow: 0 2px 8px #020617;
+}
+.victory-art-caption span {
   font-size: 11px;
   font-weight: 800;
-  color: var(--era-tint);
+  color: #fde68a;
   letter-spacing: 1px;
 }
-
-.victory-era-panel strong {
-  font-size: 20px;
+.victory-art-caption strong {
+  font-size: 24px;
   font-weight: 900;
-  color: var(--text-main);
+  color: #fff;
 }
-
-.victory-era-panel small {
+.victory-art-caption small {
   font-size: 11px;
-  color: var(--text-sub);
+  color: #e2e8f0;
 }
 
 .victory-detail {
   padding: 20px 24px 24px;
   background: var(--bg-surface);
+}
+.victory-story {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--era-tint);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  text-align: left;
+}
+.victory-story strong { font-size: 14px; color: var(--text-main); }
+.victory-story p { margin: 9px 0 0; font-size: 13px; line-height: 1.85; }
+.victory-story .victory-epilogue { border-top: 1px solid var(--border-subtle); padding-top: 12px; color: var(--accent-gold-soft); }
+.victory-note { text-align: center; }
+@media (max-width: 600px) {
+  .victory-era-panel { min-height: 235px; }
+  .victory-art-caption { padding: 30px 16px 17px; }
+  .victory-art-caption strong { font-size: 20px; }
+  .victory-detail { padding: 16px 15px 20px; }
 }
 
 /* 스토리 모달 블록 */

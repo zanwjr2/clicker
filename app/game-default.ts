@@ -3,7 +3,7 @@
 export function newGameState(now = Date.now()) {
   return {
     saveFormat: 2, theme: "evolution", gold: 500, essence: 0, shards: 0,
-    level: 1, xp: 0, progress: 0, selectedMission: null, enemyHp: 320, playerHp: 120,
+    level: 1, xp: 0, progress: 0, selectedMission: null, clearedMissions: [], enemyHp: 320, playerHp: 120,
     stamina: 72, staminaUpdatedAt: now, missionEntered: false, lastSupplyAt: 0,
     clicks: 0, kills: 0, purchases: 0, runClicks: 0, runKills: 0,
     runPurchases: 0, runChestsOpened: 0, runModuleResearch: 0, runCaravanCount: 0,

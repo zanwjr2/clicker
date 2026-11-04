@@ -53,7 +53,7 @@ const num = (v: unknown) => typeof v === "number" && Number.isFinite(v) ? v : 0;
 const random = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
 const stat = (o: any, k: string) => num(o?.[k]);
 const stage = (s: Game) => Number.isSafeInteger(s.selectedMission) &&
-  s.selectedMission >= 0 && s.selectedMission < Math.floor(num(s.progress))
+  s.selectedMission >= 0 && s.selectedMission < 140
   ? s.selectedMission : Math.floor(num(s.progress));
 const chapter = (s: Game) => Math.floor(stage(s) / 10);
 const index = (s: Game) => stage(s) % 10;
@@ -135,7 +135,8 @@ function win(s: Game, now: number) {
   const goldBase = Math.round(GOLD[i] * Math.pow(1.42, c) * multiplier * r.gold *
     ([3, 6].includes(i) ? r.cargoGold || 1 : 1));
   const bossGold = i === 9 ? Math.round(600 * Math.pow(1.42, c) * multiplier) : 0;
-  const replay = stage(s) < num(s.progress);
+  const currentStage = stage(s);
+  const replay = currentStage < num(s.progress) || s.clearedMissions.includes(currentStage);
   const gold = replay ? Math.max(1, Math.floor(goldBase * speedBonus * .25))
     : Math.floor((goldBase + bossGold) * speedBonus);
   const xp = Math.max(1, Math.floor(Math.floor(XP[i] * Math.pow(1.28, c) * r.xp) * speedBonus * (replay ? .25 : 1)));
@@ -151,6 +152,10 @@ function win(s: Game, now: number) {
   grantXp(s, xp);
   s.lastVictory = { gold, xp, essence, shard, foundKey, foundGear: foundGear ?
     { icon: foundGear.icon, rank: foundGear.rank } : null, speedBonus, replay };
+  if (!replay && currentStage < 140) {
+    s.clearedMissions.push(currentStage);
+    s.clearedMissions.sort((a: number, b: number) => a - b);
+  }
 }
 function takeDamage(s: Game, damage: number, now: number) {
   if (s.awaitingNext || s.battleOver) return;
@@ -254,6 +259,11 @@ export function resolveServerAction(previous: Game, command: ServerAction, now =
   s.consumables = { bomb: 0, potion: 0, elixir: 0, ...(s.consumables || {}) };
   s.inventory = Array.isArray(s.inventory) ? s.inventory : [];
   s.achievements = Array.isArray(s.achievements) ? s.achievements : [];
+  const verified = new Set<number>();
+  if (Array.isArray(s.clearedMissions)) for (const i of s.clearedMissions)
+    if (Number.isSafeInteger(i) && i >= 0 && i < 140) verified.add(i);
+  for (let i = 0; i < Math.min(140, Math.floor(num(s.progress))); i++) verified.add(i);
+  s.clearedMissions = [...verified].sort((a, b) => a - b);
   s.equipped = { weapon: null, armor: null, relic: null, ...(s.equipped || {}) };
   const type = command.type, choice = command.id;
   const limited = new Set(["attack", "skill", "heal", "gather", "bomb", "potion", "elixir", "strikeSpecial"]);
@@ -266,6 +276,10 @@ export function resolveServerAction(previous: Game, command: ServerAction, now =
   }
   const stats = () => calculateCombatStats(s);
   if (type === "tick") { /* Time is earned, not provided by the browser. */ }
+  else if (type === "startMission") {
+    if (s.missionEntered || !startMission(s, now, options.infiniteStamina))
+      return { ok: false as const, code: "mission-unavailable" };
+  }
   else if (type === "attack") {
     if (!startMission(s, now, options.infiniteStamina)) return { ok: false as const, code: "mission-unavailable" };
     const reduction = [4, 8].includes(index(s)) ?
@@ -303,17 +317,24 @@ export function resolveServerAction(previous: Game, command: ServerAction, now =
     if (type === "elixir") s.elixirUntil = Math.max(now, num(s.elixirUntil)) + 600_000;
   } else if (type === "selectMission") {
     if (typeof choice !== "number" || !Number.isSafeInteger(choice) || choice < 0 ||
-      choice > Math.floor(num(s.progress)) || choice >= 140)
-      return { ok: false as const, code: "mission-locked" };
-    s.selectedMission = choice < num(s.progress) ? choice : null;
+      choice >= 140)
+      return { ok: false as const, code: "invalid-mission" };
+    if (s.awaitingNext) return { ok: false as const, code: "victory-pending" };
+    s.selectedMission = choice === num(s.progress) ? null : choice;
     s.enemyHp = maxEnemy(s); s.playerHp = stats().maxHp;
     s.lastVictory = null; s.awaitingNext = false; s.battleOver = false;
     s.missionEntered = false; s.timerStarted = false; s.timer = speedLimit(s);
     s.helperRemainder = 0; s.enemyAttackAt = 0; s.combatUpdatedAt = now;
   } else if (type === "next") {
     if (!s.awaitingNext) return { ok: false as const, code: "no-victory-to-advance" };
-    if (s.selectedMission == null) s.progress++;
-    s.selectedMission = null; s.lastVictory = null;
+    const finished = stage(s), frontier = num(s.progress), replay = !!s.lastVictory?.replay;
+    if (!replay) {
+      if (finished >= 140 && s.selectedMission == null) s.progress++;
+      else while (s.progress < 140 && s.clearedMissions.includes(s.progress)) s.progress++;
+    }
+    const continueAhead = !replay && finished > frontier && finished + 1 < 140;
+    s.selectedMission = continueAhead && finished + 1 !== s.progress ? finished + 1 : null;
+    s.lastVictory = null;
     s.enemyHp = maxEnemy(s);
     s.playerHp = Math.max(Math.ceil(stats().maxHp * .65),
       Math.min(stats().maxHp, s.playerHp + stats().maxHp *
