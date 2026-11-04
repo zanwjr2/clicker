@@ -449,4 +449,15 @@ resumed.click('action', 'tutorialStop');
 assert.equal(resumed.state().tutorial.active, false);
 assert.equal(resumed.state().tutorial.version, 1);
 assert.equal(resumed.state().essence, 10); // Rewards are granted once.
+
+// UI enhancements: quick consumables in combat panel, live navigation badges, and clickable enemy stage.
+assert.match(battleMarkup, /id="enemySprite"\s+class="enemy-sprite"\s+data-action="attack"/, 'enemy sprite is directly clickable for attacks');
+assert.match(battleMarkup, /id="quickConsumables"/, 'battle controls include quick consumables slot');
+assert.match(resumed.view('quickConsumables'), /폭발탄/);
+assert.match(resumed.view('quickConsumables'), /치유 물약/);
+assert.match(resumed.view('quickConsumables'), /황금 비약/);
+assert.equal(resumed.text('chaptersNavCount'), 'CH.1');
+assert.equal(resumed.text('helpersNavCount'), '0/6');
+assert.match(resumed.text('modulesNavCount'), /\/14$/);
+assert.match(resumed.view('chapterStory'), /챕터 스토리/);
 console.log('game-smoke: saves, prestige, quests, tutorial onboarding/replay/resume passed');

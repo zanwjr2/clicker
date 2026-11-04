@@ -425,6 +425,14 @@
   function showImmediateAction(type) {
     if (activeTab !== 'battle') return 0;
     if (type === 'gather') { floatText('채집 중…', 'gold'); return 0; }
+    if (type === 'potion') { floatText('🧪 체력 회복!', 'gold'); return 0; }
+    if (type === 'elixir') { floatText('🍯 금화 2배 활성!', 'gold'); return 0; }
+    if (type === 'bomb') {
+      const enemy = $('enemySprite');
+      if (enemy) { enemy.classList.add('hit'); setTimeout(() => enemy.classList.remove('hit'), 160); }
+      floatText('💣 폭발탄 투척!', 'gold');
+      return 0;
+    }
     if (type !== 'attack' && type !== 'skill') return 0;
     if (s.awaitingNext || s.battleOver || type === 'skill' && s.essence < 25 ||
       !s.missionEntered && !adminMode && s.stamina < staminaCost()) return 0;
@@ -1005,6 +1013,13 @@
     renderStaminaLive();
     if (pendingVisualDamage) paintPendingDamage();
   }
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const SLOT_LABEL = { weapon: '무기 · 공격력', armor: '방어구 · 최대 체력', relic: '유물 · 금화 보너스' };
+  const CONSUMABLES = [
+    { id: 'bomb', icon: '💣', name: '폭발탄', desc: '현재 적에게 강력한 즉시 피해', cost: 300 },
+    { id: 'potion', icon: '🧪', name: '치유 물약', desc: '최대 체력의 65% 즉시 회복', cost: 180 },
+    { id: 'elixir', icon: '🍯', name: '황금 비약', desc: '10분간 금화 획득 +100%', cost: 900 }
+  ];
   function renderBattle() {
     const c = chapterIndex(), i = missionIndex(), info = mission(), max = missionMax(), t = era();
     const ep = chapter(), storyline = missionStory(), wp = chapterWeapon();
@@ -1024,7 +1039,7 @@
     $('chapterProgress').textContent = Math.max(0, Math.min(MISSIONS_PER_CHAPTER, s.progress - c * MISSIONS_PER_CHAPTER)) + ' / ' + MISSIONS_PER_CHAPTER + ' 완료';
     $('chapterReward').textContent = '보스 추가 금화 ' + fmt(Math.floor(600 * Math.pow(BALANCE.chapterGold, c) * goldMulti())) + ' · 유물 ' + (1 + (chapterRule().shard || 0)) + '개';
     $('chapterTrait').textContent = '✧ ' + chapterRule().name + ' · ' + chapterRule().detail;
-    $('chapterStory').innerHTML = `<span>${ep.scene} ${t.age}</span><strong>${ep.prologue}</strong><small>챕터 전체 이야기 읽기 ↗</small>`;
+    $('chapterStory').innerHTML = `<span>${ep.scene} 챕터 스토리</span><strong>${ep.prologue}</strong><small>${t.age} 이야기 읽기 ↗</small>`;
     const missionSignature = c + ':' + i + ':' + s.progress + ':' + s.awaitingNext + ':' + s.selectedMission;
     if ($('missionList').dataset.signature !== missionSignature) {
       $('missionList').innerHTML = MISSION_TYPES.map((m, index) => {
@@ -1063,6 +1078,21 @@
     $('growthNext').textContent = '다음 성장 돌파 LV.' + (Math.floor(s.level / 5) + 1) * 5 + ' · ' + (5 - s.level % 5) + '레벨 남음';
     $('healVal').textContent = '+' + fmt(heal()) + ' HP'; $('gatherVal').textContent = '+' + fmt(gather()) + ' 금화';
     $('skillDetail').textContent = '마력 25 소모 · 피해 ' + fmt(60 + attack() * 7 + dps() * 2);
+    const skillBtn = document.querySelector('[data-action="skill"]');
+    if (skillBtn) skillBtn.classList.toggle('skill-ready', s.essence >= 25 && !s.awaitingNext && !s.battleOver);
+    const qcNode = $('quickConsumables');
+    if (qcNode) {
+      const elixirSec = Math.max(0, Math.ceil((Number(s.elixirUntil || 0) - Date.now()) / 1000));
+      const qcSignature = `${s.consumables.bomb || 0}:${s.consumables.potion || 0}:${s.consumables.elixir || 0}:${elixirSec > 0 ? Math.ceil(elixirSec / 5) : 0}:${s.awaitingNext}:${s.battleOver}`;
+      if (qcNode.dataset.signature !== qcSignature) {
+        qcNode.innerHTML = `<div class="quick-consumables-head"><span>🎒 전투 소모품</span>${elixirSec > 0 ? `<em class="elixir-active-tag">🍯 금화 2배 ${Math.floor(elixirSec / 60)}:${String(elixirSec % 60).padStart(2, '0')}</em>` : `<button type="button" class="quick-bag-link" data-nav="inventory">보관함 →</button>`}</div><div class="quick-consumables-row">${CONSUMABLES.map(item => {
+          const count = s.consumables[item.id] || 0;
+          const disabled = count < 1 || (item.id === 'bomb' && (s.awaitingNext || s.battleOver));
+          return `<button type="button" class="quick-consumable-btn ${count > 0 ? 'has-stock' : ''}" data-consumable-use="${item.id}" ${disabled ? 'disabled' : ''} title="${item.name} · ${item.desc}"><span>${item.icon}</span><strong>${item.name}</strong><em>×${count}</em></button>`;
+        }).join('')}</div>`;
+        qcNode.dataset.signature = qcSignature;
+      }
+    }
     const q = quest();
     const questSignature = s.questIndex + ':' + (q ? statCounter(q.key) : 0);
     if ($('quickQuest').dataset.signature !== questSignature) {
@@ -1115,7 +1145,7 @@
   }
   function renderQuests() {
     const q = quest();
-    $('secondaryView').innerHTML = `<div class="secondary"><div class="secondary-header"><p>탐사 임무와 업적을 완료하고 보상을 받아 성장하세요.</p><button class="section-count purchase-button" style="width:auto" data-action="daily">${s.dailyClaim === today() ? '✓ 오늘의 출석 완료' : '🎁 일일 보상 받기'}</button></div><div class="panel" style="padding:19px;margin-bottom:20px"><div class="panel-head" style="padding:0 0 14px">📋 진행 중인 지령 <small>총 ${QUESTS.length}개</small></div>${q ? `<div class="quest-item" style="margin-top:12px"><div class="item-icon">📜</div><div><strong>${q.title}</strong><p>${q.desc} · ${fmt(statCounter(q.key))} / ${q.target}</p><div class="progress-stat"><div style="width:${Math.min(100, statCounter(q.key) / q.target * 100)}%"></div></div></div><button class="purchase-button" data-action="claimQuest" ${statCounter(q.key) < q.target ? 'disabled' : ''}><span class="gold-icon" aria-label="금화">G</span> ${fmt(q.gold)} 받기</button></div>` : `<p style="color:#a3b8c7;font-size:12px">현재 준비된 모든 지령을 완료했습니다.</p>`}</div><div class="secondary-header"><p>업적 도전</p><span class="section-count">${s.achievements.length} / ${ACHIEVEMENTS.length} 획득</span></div><div class="achievement-grid">${ACHIEVEMENTS.map(a => { const done = statCounter(a.key) >= a.target, claimed = s.achievements.includes(a.id); return `<article class="achievement-card ${done ? 'done' : ''} ${claimed ? 'claimed' : ''}"><div class="achieve-icon">${a.icon}</div><h3>${a.title}</h3><p>${a.desc}<br>${fmt(Math.min(statCounter(a.key), a.target))} / ${fmt(a.target)}</p><div class="item-meta"><span>${claimed ? '수령 완료' : done ? '달성!' : '도전 중'}</span><strong><span class="gold-icon" aria-label="금화">G</span> ${fmt(a.reward)}</strong></div><button class="purchase-button" data-achievement="${a.id}" ${!done || claimed ? 'disabled' : ''}>${claimed ? '수령 완료' : done ? '보상 수령' : '미달성'}</button></article>`; }).join('')}</div></div>`;
+    $('secondaryView').innerHTML = `<div class="secondary"><div class="secondary-header"><p>탐사 임무와 업적을 완료하고 보상을 받아 성장하세요.</p><button class="section-count purchase-button daily-claim-btn" data-action="daily">${s.dailyClaim === today() ? '✓ 오늘의 출석 완료' : '🎁 일일 보상 받기'}</button></div><div class="panel quest-active-panel"><div class="panel-head">📋 진행 중인 지령 <small>총 ${QUESTS.length}개</small></div>${q ? `<div class="quest-item"><div class="item-icon">📜</div><div><strong>${q.title}</strong><p>${q.desc} · ${fmt(statCounter(q.key))} / ${q.target}</p><div class="progress-stat"><div style="width:${Math.min(100, statCounter(q.key) / q.target * 100)}%"></div></div></div><button class="purchase-button" data-action="claimQuest" ${statCounter(q.key) < q.target ? 'disabled' : ''}><span class="gold-icon" aria-label="금화">G</span> ${fmt(q.gold)} 받기</button></div>` : `<p class="quest-all-done">현재 준비된 모든 지령을 완료했습니다.</p>`}</div><div class="secondary-header"><p>업적 도전</p><span class="section-count">${s.achievements.length} / ${ACHIEVEMENTS.length} 획득</span></div><div class="achievement-grid">${ACHIEVEMENTS.map(a => { const done = statCounter(a.key) >= a.target, claimed = s.achievements.includes(a.id); return `<article class="achievement-card ${done ? 'done' : ''} ${claimed ? 'claimed' : ''}"><div class="achieve-icon">${a.icon}</div><h3>${a.title}</h3><p>${a.desc}<br>${fmt(Math.min(statCounter(a.key), a.target))} / ${fmt(a.target)}</p><div class="item-meta"><span>${claimed ? '수령 완료' : done ? '달성!' : '도전 중'}</span><strong><span class="gold-icon" aria-label="금화">G</span> ${fmt(a.reward)}</strong></div><button class="purchase-button" data-achievement="${a.id}" ${!done || claimed ? 'disabled' : ''}>${claimed ? '수령 완료' : done ? '보상 수령' : '미달성'}</button></article>`; }).join('')}</div></div>`;
   }
   function renderArena() {
     const opponentPower = 50 + s.arenaWins * 55;
@@ -1126,13 +1156,6 @@
     const unlocked = Math.max(0, Math.min(MISSIONS_PER_CHAPTER, s.progress - chapterIndex() * MISSIONS_PER_CHAPTER + (s.awaitingNext && !isReplay() ? 1 : 0)));
     $('secondaryView').innerHTML = `<div class="secondary"><div class="secondary-header"><p>${era().age} · ${chapterTitle()}에 등장하는 적과 사건 기록입니다.</p><span class="section-count">${unlocked}/${MISSIONS_PER_CHAPTER}개 기록</span></div><div class="codex-grid">${MISSION_TYPES.map((m, i) => { const known = unlocked >= i + 1, story = chapter().missions[i]; return `<article class="codex-card ${known ? '' : 'locked'}"><div class="codex-sprite">${known ? era().emoji[[0,1,2,3,4,5,3,1,4,6][i]] : '❔'}</div><h3>${known ? story[0] : '미발견 미션'}</h3><small>${known ? m.tag + ' / 기록 완료' : '스토리 해금 전'}</small><p>${known ? story[2] : '해당 작전을 클리어하면 결말이 공개됩니다.'}</p></article>`; }).join('')}</div><div class="section-label">문명 연대기 · ${CHAPTERS.length}개 챕터</div><div class="era-chronicle">${CHAPTERS.map((ch,i) => `<article class="chronicle-era ${i <= unlockedChapter() ? 'reached' : ''}"><span>${ch.scene}</span><strong>CH.${i+1} ${ch.name}</strong><small>${ERAS[ch.era].age} · ${ch.period}</small><button class="tiny-btn" data-chapter-story="${i}" ${i > unlockedChapter() ? 'disabled' : ''}>${i > unlockedChapter() ? '미개척' : '이야기 보기'}</button></article>`).join('')}</div></div>`;
   }
-  const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const SLOT_LABEL = { weapon: '무기 · 공격력', armor: '방어구 · 최대 체력', relic: '유물 · 금화 보너스' };
-  const CONSUMABLES = [
-    { id: 'bomb', icon: '💣', name: '폭발탄', desc: '현재 적에게 강력한 즉시 피해', cost: 300 },
-    { id: 'potion', icon: '🧪', name: '치유 물약', desc: '최대 체력의 65% 즉시 회복', cost: 180 },
-    { id: 'elixir', icon: '🍯', name: '황금 비약', desc: '10분간 금화 획득 +100%', cost: 900 }
-  ];
   function renderInventory() {
     const slots = ['weapon', 'armor', 'relic'];
     const chestNames = [{ id:'bronze', name:'낡은 보급상자', icon:'📦', rarity:'일반~전설' },{ id:'silver', name:'정예 보급상자', icon:'🗝️', rarity:'희귀 확률 증가' },{ id:'gold', name:'전설 보급상자', icon:'🎁', rarity:'고급 등급 보장 가능' }];
@@ -1241,6 +1264,37 @@
     $('levelFill').style.width = clamp(s.xp / xpGoal(s.level) * 100, 0, 100) + '%';
     $('xpMini').textContent = fmt(s.xp) + ' / ' + fmt(xpGoal(s.level));
     for (const el of document.querySelectorAll('[data-nav]')) el.classList.toggle('selected', el.dataset.nav === activeTab);
+    const ownedHelpers = HELPERS.filter(h => (s.helpers[h.id] || 0) > 0).length;
+    const totalKeys = (s.keys.bronze || 0) + (s.keys.silver || 0) + (s.keys.gold || 0);
+    const qNow = quest();
+    const questReady = Boolean(qNow && statCounter(qNow.key) >= qNow.target);
+    const achieveReady = ACHIEVEMENTS.filter(a => statCounter(a.key) >= a.target && !s.achievements.includes(a.id)).length;
+    const dailyReady = s.dailyClaim !== today();
+    const questAlertCount = (questReady ? 1 : 0) + achieveReady + (dailyReady ? 1 : 0);
+    const caravanReady = Boolean(s.caravan && Date.now() >= s.caravan.finish);
+    const eventReady = dailyEvent() >= 5 && !s.eventClaimed;
+    const expAlert = caravanReady || eventReady;
+    const techDone = Boolean(s.researchQueue && Date.now() >= s.researchQueue.finishAt);
+    const doneTechCount = TECHS.filter(t => Boolean(s.technologies?.[t.id])).length;
+    const setBadge = (id, text, alert = false) => {
+      const node = $(id);
+      if (!node) return;
+      node.textContent = text;
+      if (typeof node.closest === 'function') {
+        node.closest('.nav-item, .nav-more-toggle')?.classList.toggle('has-alert', Boolean(alert && text));
+      }
+    };
+    setBadge('chaptersNavCount', `CH.${chapterIndex() + 1}`);
+    setBadge('helpersNavCount', `${ownedHelpers}/${HELPERS.length}`);
+    setBadge('modulesNavCount', techDone ? '완료!' : `${doneTechCount}/${TECHS.length}`, techDone);
+    setBadge('inventoryNavBadge', totalKeys > 0 ? `🗝️${totalKeys}` : `${s.inventory.length}`, totalKeys > 0);
+    setBadge('questsNavBadge', questAlertCount > 0 ? `${questAlertCount}건` : '', questAlertCount > 0);
+    setBadge('arenaNavBadge', s.arenaWins > 0 ? `${s.arenaWins}승` : '');
+    setBadge('expeditionNavBadge', expAlert ? '수령!' : s.caravan ? '파견중' : '', expAlert);
+    setBadge('prestigeNavBadge', s.prestige.points > 0 ? `${s.prestige.points}P` : '', s.prestige.points > 0);
+    setBadge('codexNavBadge', `${unlockedChapter() + 1}/${CHAPTERS.length}`);
+    const moreAlerts = (totalKeys > 0 ? 1 : 0) + questAlertCount + (expAlert ? 1 : 0) + (s.prestige.points > 0 ? 1 : 0);
+    setBadge('moreNavBadge', moreAlerts > 0 ? `${moreAlerts}` : '', moreAlerts > 0);
     $('moreNav').classList.toggle('hidden', !moreNavExpanded);
     $('moreNavToggle').setAttribute('aria-expanded', String(moreNavExpanded));
     $('moreNavToggle').classList.toggle('selected', ['inventory','quests','arena','expedition','prestige','codex'].includes(activeTab));
@@ -1280,7 +1334,7 @@
     openModal('story', `<span class="modal-crest">📜</span><div class="modal-overline">CH.${String(chapterIndex()+1).padStart(2,'0')} / MISSION ${String(missionIndex()+1).padStart(2,'0')} OF ${MISSIONS_PER_CHAPTER}</div><h2>${story[0]}</h2><p class="story-intro">${chapter().prologue}</p><div class="story-incident"><strong>이번 사건</strong><p>${story[1]}</p></div>${s.awaitingNext ? `<div class="story-epilogue"><strong>결말</strong><p>${story[2]}</p></div>` : `<div class="story-locked">🔒 결말은 미션을 완료하면 공개됩니다.</div>`}<div class="modal-actions"><button data-action="close">${s.awaitingNext ? '결과 확인' : '작전으로 돌아가기 · 스태미너 ' + staminaCost() + ' 소모'}</button></div>`);
   }
   function introModal() { openModal('intro', `<span class="modal-crest">🌄</span><div class="modal-overline">PROLOGUE / FROM STONE TO STARS</div><h2>돌에서 별까지</h2><p>우리는 아직 이름 없는 작은 부족입니다.<br>밤을 밝히는 것은 희미한 불씨 하나, 손에 쥔 것은 돌도끼 한 자루뿐.<br><br>불을 지키고, 도시를 세우고, 철과 증기를 발명하세요.<br>컴퓨터와 미래 기술을 넘어 인류를 별의 바다로 이끄세요.<br><br>7개 시대, 14개 챕터, 140개 미션에 이어지는 이야기가 기다립니다.</p><div class="modal-actions"><button data-action="begin">인류의 연대기 시작 🪓</button></div>`); }
-  function settingsModal() { openModal('settings', `<span class="modal-overline">CHRONICLE SETTINGS</span><h2>문명 진화 연대기</h2><p>원시 시대에서 우주 개척까지 일곱 시대를 여행합니다. 시대마다 무기·적·스토리가 달라집니다.<br>최고 해금 <b>챕터 ${unlockedChapter()+1}</b> · 현재 플레이 <b>${era().age}</b></p><div class="theme-select">${ERAS.map((e,i) => `<button class="theme-option ${i === eraIndex() ? 'selected' : ''}" data-era-story="${i}" ${i > unlockedEraIndex() ? 'disabled' : ''}><span>${e.scene}</span><strong>${e.age}</strong></button>`).join('')}</div><div class="modal-actions"><button class="modal-secondary" data-action="help">게임 설명</button><button class="modal-secondary" data-action="restartTutorial">🎓 튜토리얼 시작</button><button data-action="close">닫기</button></div><div style="margin-top:25px;border-top:1px solid #425567;padding-top:14px"><button class="modal-secondary" data-action="confirmReset" style="background:transparent;border:0;color:#cb999c;font-size:11px">모든 진행 상황 초기화</button></div>`); }
+  function settingsModal() { openModal('settings', `<span class="modal-overline">CHRONICLE SETTINGS</span><h2>문명 진화 연대기</h2><p>원시 시대에서 우주 개척까지 일곱 시대를 여행합니다. 시대마다 무기·적·스토리가 달라집니다.<br>최고 해금 <b>챕터 ${unlockedChapter()+1}</b> · 현재 플레이 <b>${era().age}</b></p><div class="theme-select">${ERAS.map((e,i) => `<button class="theme-option ${i === eraIndex() ? 'selected' : ''}" data-era-story="${i}" ${i > unlockedEraIndex() ? 'disabled' : ''}><span>${e.scene}</span><strong>${e.age}</strong></button>`).join('')}</div><div class="modal-actions"><button class="modal-secondary" data-action="help">게임 설명</button><button class="modal-secondary" data-action="restartTutorial">🎓 튜토리얼 시작</button><button data-action="close">닫기</button></div><div class="modal-danger-zone"><button class="modal-secondary modal-danger-link" data-action="confirmReset">모든 진행 상황 초기화</button></div>`); }
   function testToolsModal() {
     const status = adminMode ? '🛠 관리자 테스트 모드' : '🔒 일반 플레이 모드';
     const modeButton = adminAvailable
@@ -1298,7 +1352,7 @@
     window.location.assign(enter ? '/play.html?mode=admin' : '/play.html');
   }
   function helpModal() { openModal('help', `<span class="modal-crest">📖</span><div class="modal-overline">HOW TO PLAY</div><h2>문명 개척 가이드</h2><p style="text-align:left">① <b>전투</b>에서 시대별 무기 버튼을 눌러 공격합니다. (Space)<br>② 미션 첫 공격에만 <b>스태미너</b>를 소모합니다. 기본 90초마다 1 회복, 재도전 시 입장 비용이 다시 발생합니다.<br>③ <b>상점 · 장비 강화</b>의 스태미너 분류에서 회복 체계와 행군 효율을 구매할 수 있습니다.<br>④ <b>야영 보급</b>은 금화로 스태미너를 보충하며 10분간 재사용 대기합니다.<br>⑤ 매 레벨업마다 최대 스태미너 +2, 공격력 +2, 최대 체력 +10이 적용됩니다.<br>⑥ 총 14챕터·140미션에 시작 사건과 클리어 후 결말이 있습니다.<br>⑦ <b>기술 연구</b>는 시간이 지나 완료되고, 프레스티지 후에도 유지됩니다.<br>⑧ 나머지 기능은 상단 <b>더보기</b>에서 찾을 수 있습니다. 상점의 일반 강화는 프레스티지 시 초기화됩니다.<br>⑨ 서버 저장에 연결되지 않으면 브라우저에 백업됩니다.</p><div class="modal-actions"><button class="modal-secondary" data-action="restartTutorial">🎓 직접 따라하기</button><button data-action="close">확인</button></div>`); }
-  function resetConfirm() { openModal('reset', `<span class="modal-crest">⚠️</span><h2>${adminMode ? '테스트 데이터' : '내 계정'} 초기화</h2><p>${adminMode ? '관리자 테스트 저장 데이터만' : '일반 계정의 레벨, 재화, 장비, 미션과 리더보드 전투력까지'} 초기화됩니다.<br>복구할 수 없습니다. 정말 초기화할까요?</p><div class="modal-actions"><button class="modal-secondary" data-action="testTools">취소</button><button data-action="reset" style="background:#df878d">초기화 확인</button></div>`); }
+  function resetConfirm() { openModal('reset', `<span class="modal-crest">⚠️</span><h2>${adminMode ? '테스트 데이터' : '내 계정'} 초기화</h2><p>${adminMode ? '관리자 테스트 저장 데이터만' : '일반 계정의 레벨, 재화, 장비, 미션과 리더보드 전투력까지'} 초기화됩니다.<br>복구할 수 없습니다. 정말 초기화할까요?</p><div class="modal-actions"><button class="modal-secondary" data-action="testTools">취소</button><button class="modal-danger-btn" data-action="reset">초기화 확인</button></div>`); }
   async function resetProgress() {
     if (serverActionsPending || serverSaving) { toast('진행 중인 서버 작업이 끝난 후 초기화해 주세요.'); return; }
     if (!serverReady) {

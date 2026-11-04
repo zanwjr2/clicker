@@ -1,55 +1,111 @@
 /* ==========================================================================
-   ERA BOUND — Clean & Intuitive UI Theme
-   Replaces heavy ridge borders with clean dark slate cards and era accents.
+   ERA BOUND — Dark Fantasy & Sci-Fi Civilization Chronicle UI System
    ========================================================================== */
 
 :root {
-  --bg-base: #0b1017;
-  --bg-surface: #131b26;
-  --bg-elevated: #1a2433;
-  --bg-hover: #223044;
-  --border-subtle: rgba(148, 163, 184, 0.16);
-  --border-strong: rgba(148, 163, 184, 0.28);
+  --bg-base: #090d14;
+  --bg-surface: #111824;
+  --bg-surface-2: #151f2e;
+  --bg-elevated: #1b2738;
+  --bg-hover: #243349;
+  --border-subtle: rgba(148, 163, 184, 0.14);
+  --border-strong: rgba(148, 163, 184, 0.26);
   --text-main: #f1f5f9;
   --text-sub: #cbd5e1;
-  --text-muted: #94a3b8;
+  --text-muted: #8b9bb4;
   --accent-gold: #f59e0b;
   --accent-gold-soft: #fcd34d;
   --accent-green: #10b981;
+  --accent-green-soft: #6ee7b7;
   --accent-red: #ef4444;
+  --accent-red-soft: #fca5a5;
   --accent-purple: #a855f7;
+  --accent-purple-soft: #d8b4fe;
   --era-tint: #eab308;
-  --era-dark: #1e293b;
+  --era-tint-soft: #fde68a;
+  --era-dark: #1d2636;
   --era-halo: rgba(234, 179, 8, 0.22);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --primary: var(--era-tint);
+  --primary-light: var(--era-tint-soft);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.28);
 }
 
-/* 시대별 테마 컬러 포인트 */
-body[data-era="0"] { --era-tint: #e09f5a; --era-dark: #291f1a; --era-halo: rgba(224, 159, 90, 0.25); }
-body[data-era="1"] { --era-tint: #eab308; --era-dark: #292418; --era-halo: rgba(234, 179, 8, 0.24); }
-body[data-era="2"] { --era-tint: #38bdf8; --era-dark: #172634; --era-halo: rgba(56, 189, 248, 0.22); }
-body[data-era="3"] { --era-tint: #f97316; --era-dark: #2c1e1a; --era-halo: rgba(249, 115, 22, 0.24); }
-body[data-era="4"] { --era-tint: #14b8a6; --era-dark: #132a2e; --era-halo: rgba(20, 184, 166, 0.24); }
-body[data-era="5"] { --era-tint: #6366f1; --era-dark: #191e38; --era-halo: rgba(99, 102, 241, 0.26); }
-body[data-era="6"] { --era-tint: #c084fc; --era-dark: #221638; --era-halo: rgba(192, 132, 252, 0.28); }
+/* 7대 시대별 다이내믹 테마 팔레트 */
+body[data-era="0"] {
+  --era-tint: #e89b50;
+  --era-tint-soft: #fbd3a7;
+  --era-dark: #251c17;
+  --era-halo: rgba(232, 155, 80, 0.24);
+}
+body[data-era="1"] {
+  --era-tint: #eab308;
+  --era-tint-soft: #fef08a;
+  --era-dark: #262115;
+  --era-halo: rgba(234, 179, 8, 0.24);
+}
+body[data-era="2"] {
+  --era-tint: #38bdf8;
+  --era-tint-soft: #bae6fd;
+  --era-dark: #132333;
+  --era-halo: rgba(56, 189, 248, 0.23);
+}
+body[data-era="3"] {
+  --era-tint: #f97316;
+  --era-tint-soft: #fed7aa;
+  --era-dark: #281b16;
+  --era-halo: rgba(249, 115, 22, 0.24);
+}
+body[data-era="4"] {
+  --era-tint: #14b8a6;
+  --era-tint-soft: #99f6e4;
+  --era-dark: #11262a;
+  --era-halo: rgba(20, 184, 166, 0.24);
+}
+body[data-era="5"] {
+  --era-tint: #6366f1;
+  --era-tint-soft: #c7d2fe;
+  --era-dark: #171c36;
+  --era-halo: rgba(99, 102, 241, 0.26);
+}
+body[data-era="6"] {
+  --era-tint: #c084fc;
+  --era-tint-soft: #e9d5ff;
+  --era-dark: #201435;
+  --era-halo: rgba(192, 132, 252, 0.28);
+}
 
 body {
   color: var(--text-main);
-  background: radial-gradient(circle at 50% 0%, var(--era-dark) 0%, var(--bg-base) 65%);
-  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:
+    radial-gradient(ellipse 90% 50% at 50% -8%, var(--era-halo) 0%, transparent 62%),
+    radial-gradient(circle at 50% 0%, var(--era-dark) 0%, var(--bg-base) 70%);
+  background-attachment: fixed;
   line-height: 1.5;
-  margin: 0;
 }
 
-body::before,
-body::after {
-  display: none !important;
+.gold-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.45em;
+  height: 1.45em;
+  min-width: 1.45em;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fde047, #d97706);
+  color: #451a03 !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 0.72em;
+  font-weight: 900;
+  line-height: 1;
+  vertical-align: middle;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 /* ==========================================================================
-   1. 상단 바 (Topbar)
+   1. 상단 바 (Topbar — Full-bleed sticky header with centered inner grid)
    ========================================================================== */
 .topbar {
   position: sticky;
@@ -58,45 +114,59 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1280px;
-  height: 58px;
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
+  min-height: 62px;
+  padding: 8px max(20px, calc((100% - 1280px) / 2));
   gap: 12px;
-  background: rgba(15, 23, 34, 0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(11, 16, 25, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.32);
 }
 
 .topbar .brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: auto;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 6px 4px 2px;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.15s;
+}
+
+.topbar .brand:hover {
+  opacity: 0.9;
 }
 
 .topbar .brand-mark {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  font-size: 15px;
-  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  font-size: 17px;
+  border-radius: 9px;
   background: linear-gradient(135deg, var(--era-tint), #f59e0b);
-  color: #0f172a;
+  color: #090d14;
   font-weight: 900;
-  box-shadow: 0 2px 8px var(--era-halo);
+  box-shadow: 0 2px 12px var(--era-halo);
 }
 
 .topbar .brand-overline {
-  display: none;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  color: var(--text-muted);
+  line-height: 1;
+  margin-bottom: 2px;
 }
 
 .topbar .brand-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  line-height: 1.1;
   color: var(--text-main);
 }
 
@@ -106,25 +176,42 @@ body::after {
 }
 
 .topbar .header-season {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-sub);
   background: var(--bg-surface);
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.topbar .header-season:hover {
+  border-color: var(--era-tint);
+  background: var(--bg-elevated);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 10px var(--accent-green);
+  animation: pulseDot 2.4s ease-in-out infinite;
 }
 
 .topbar .season-tag {
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
-  color: var(--accent-gold-soft);
-  font-size: 11px;
-  border: 0;
+  color: var(--era-tint-soft);
+  font-size: 10px;
+  font-weight: 800;
 }
 
 .topbar .top-resources {
@@ -138,22 +225,36 @@ body::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 88px;
+  min-width: 92px;
   padding: 5px 11px;
   border-radius: var(--radius-sm);
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.topbar .top-resource:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
 }
 
 .topbar .top-resource > span {
   font-size: 15px;
+  line-height: 1;
+}
+
+.topbar .top-resource div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
 }
 
 .topbar .top-resource small {
-  display: block;
   font-size: 10px;
   color: var(--text-muted);
-  line-height: 1.1;
+  font-weight: 600;
 }
 
 .topbar .top-resource strong {
@@ -164,8 +265,13 @@ body::after {
 }
 
 .top-stamina {
-  border-color: rgba(245, 158, 11, 0.35) !important;
-  background: rgba(245, 158, 11, 0.08) !important;
+  border-color: rgba(245, 158, 11, 0.36) !important;
+  background: rgba(245, 158, 11, 0.09) !important;
+}
+
+.top-stamina:hover {
+  border-color: var(--accent-gold) !important;
+  background: rgba(245, 158, 11, 0.15) !important;
 }
 
 .top-stamina strong {
@@ -181,12 +287,12 @@ body::after {
 .save-indicator {
   white-space: nowrap;
   font-size: 11px;
-  font-weight: 600;
-  color: #6ee7b7;
+  font-weight: 700;
+  color: var(--accent-green-soft);
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.25);
   border-radius: var(--radius-sm);
-  padding: 5px 9px;
+  padding: 6px 10px;
 }
 
 .test-tools-button,
@@ -199,8 +305,8 @@ body::after {
   font-size: 12px;
   font-weight: 700;
   padding: 6px 12px;
+  min-height: 34px;
   white-space: nowrap;
-  cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
 
@@ -225,20 +331,29 @@ body::after {
   color: var(--accent-gold-soft);
 }
 
+.account-top-button.signed-in {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--accent-green-soft);
+}
+
 .topbar .icon-button {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   background: var(--bg-elevated);
   color: var(--text-sub);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
-  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .topbar .icon-button:hover {
   background: var(--bg-hover);
+  border-color: var(--era-tint);
   color: #fff;
 }
 
@@ -248,8 +363,8 @@ body::after {
   justify-content: center;
   gap: 12px;
   padding: 8px 16px;
-  background: rgba(180, 83, 9, 0.25);
-  border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+  background: rgba(180, 83, 9, 0.28);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.45);
   color: #fde68a;
   font-size: 12px;
   font-weight: 700;
@@ -258,43 +373,32 @@ body::after {
 .admin-mode-notice button {
   border: 1px solid #fbbf24;
   border-radius: var(--radius-sm);
-  background: #1e293b;
+  background: var(--bg-surface);
   color: #fde68a;
   padding: 4px 10px;
   font-weight: 700;
   font-size: 11px;
-  cursor: pointer;
 }
 
 /* ==========================================================================
-   2. 메인 셸 & 상단 통합 내비게이션 (Shell & Sidebar)
+   2. 메인 셸 & 상단 통합 내비게이션 (Shell & Navigation Dock)
    ========================================================================== */
 .shell {
-  display: block;
-  max-width: 1280px;
-  margin: 16px auto 48px;
-  padding: 0 16px;
-  min-height: 0;
-  border: 0;
-  outline: 0;
-  box-shadow: none;
-  background: transparent;
+  width: 100%;
+  max-width: 1320px;
+  margin: 14px auto 48px;
+  padding: 0 20px;
+  flex: 1;
 }
 
 .sidebar {
-  display: block;
-  position: relative;
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 12px;
   margin-bottom: 14px;
-  background: var(--bg-surface);
+  background: rgba(17, 24, 36, 0.92);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-}
-
-.sidebar-top {
-  display: block;
+  box-shadow: var(--shadow-card);
 }
 
 .sidebar .nav-caption,
@@ -309,39 +413,46 @@ body::after {
   gap: 6px;
 }
 
-.main-nav > .nav-item {
+.main-nav > .nav-item,
+.more-nav > .nav-item {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 38px;
+  min-height: 40px;
   width: 100%;
-  padding: 0 8px;
+  padding: 0 10px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
   color: var(--text-sub);
   font-size: 13px;
   font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: none;
-  text-shadow: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 
 .nav-item > span:first-child {
   font-size: 15px;
-  width: auto;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .nav-item b,
 .nav-item > span:last-child:not(:first-child) {
   font-size: 10px;
   font-weight: 800;
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.07);
   color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.nav-item b:empty,
+.nav-item > span:last-child:not(:first-child):empty {
+  display: none;
 }
 
 .nav-item:hover {
@@ -352,60 +463,53 @@ body::after {
 
 .nav-item.selected {
   border-color: var(--era-tint);
-  background: rgba(234, 179, 8, 0.14);
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.18), rgba(234, 179, 8, 0.06));
   color: #fff;
-  box-shadow: 0 0 0 1px var(--era-tint);
+  box-shadow: 0 0 0 1px var(--era-tint), 0 4px 14px var(--era-halo);
 }
 
 .nav-item.selected b,
 .nav-item.selected > span:last-child:not(:first-child) {
   background: var(--era-tint);
-  color: #0f172a;
+  color: #090d14;
+}
+
+.nav-item.has-alert b,
+.nav-item.has-alert > span:last-child:not(:first-child) {
+  background: rgba(16, 185, 129, 0.22);
+  color: var(--accent-green-soft);
+  border: 1px solid rgba(16, 185, 129, 0.45);
 }
 
 .main-nav > .nav-more {
   border-color: var(--border-strong);
-  background: var(--bg-base);
-  color: var(--text-sub);
+  background: var(--bg-surface-2);
 }
 
 .more-nav {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   grid-column: 1 / -1;
-  gap: 8px;
-  padding: 12px 0 2px;
-  margin-top: 8px;
+  gap: 6px;
+  padding: 10px 0 2px;
+  margin-top: 6px;
   border-top: 1px solid var(--border-subtle);
 }
 
-.more-nav .nav-item {
-  width: 100%;
+.more-nav > .nav-item {
   min-height: 36px;
-  padding: 0 10px;
-  justify-content: center;
-  gap: 6px;
-  white-space: nowrap;
   font-size: 12px;
   font-weight: 600;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
   background: var(--bg-base);
-  color: var(--text-sub);
-}
-
-.more-nav .nav-item:hover {
-  background: var(--bg-elevated);
-  color: #fff;
 }
 
 /* ==========================================================================
-   3. 페이지 타이틀 헤더 (Page Title)
+   3. 페이지 타이틀 헤더 (Page Title Banner)
    ========================================================================== */
 .main-content {
-  padding: 0;
-  max-width: none;
-  background: none;
+  width: 100%;
+  min-width: 0;
 }
 
 .game-banner {
@@ -417,12 +521,13 @@ body::after {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: var(--bg-surface);
+  background: linear-gradient(135deg, var(--bg-surface-2) 0%, var(--bg-surface) 100%);
   margin: 0 0 14px;
-  padding: 14px 20px;
+  padding: 15px 22px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  border-left: 4px solid var(--era-tint);
+  box-shadow: var(--shadow-card);
 }
 
 .page-title-copy {
@@ -435,31 +540,34 @@ body::after {
   font-size: 11px;
   font-weight: 800;
   color: var(--era-tint);
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 }
 
 .page-title h1 {
-  font-size: 20px;
-  font-weight: 800;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 21px;
+  font-weight: 900;
   line-height: 1.25;
-  margin: 2px 0 4px;
+  margin: 3px 0 4px;
   color: var(--text-main);
-  text-shadow: none;
+  letter-spacing: -0.3px;
 }
 
 .page-title p {
   font-size: 13px;
   margin: 0;
-  max-width: 780px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
   color: var(--text-sub);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .mission-badge {
   flex-shrink: 0;
-  padding: 8px 14px;
+  padding: 9px 15px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
@@ -470,14 +578,15 @@ body::after {
 }
 
 .mission-badge span {
-  color: #34d399;
+  color: var(--accent-green-soft);
+  margin-left: 4px;
 }
 
 .mission-badge em {
   display: block;
   font-size: 11px;
-  margin-top: 2px;
-  color: var(--accent-gold-soft);
+  margin-top: 3px;
+  color: var(--era-tint-soft);
   font-style: normal;
   font-weight: 700;
 }
@@ -487,7 +596,7 @@ body::after {
    ========================================================================== */
 .battle-grid {
   display: grid;
-  grid-template-columns: 260px minmax(380px, 1fr) 320px;
+  grid-template-columns: 272px minmax(380px, 1fr) 334px;
   gap: 14px;
   align-items: stretch;
 }
@@ -496,7 +605,7 @@ body::after {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   background: var(--bg-surface);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
@@ -504,13 +613,13 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.03);
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.025);
   color: var(--text-main);
   padding: 12px 16px;
   border-bottom: 1px solid var(--border-subtle);
   font-size: 13px;
   font-weight: 800;
-  text-shadow: none;
 }
 
 .panel-head small {
@@ -519,7 +628,13 @@ body::after {
   font-weight: 600;
 }
 
-/* --- 좌측: 탐사 경로 패널 --- */
+.online-chip {
+  color: var(--accent-green-soft) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+}
+
+/* --- 좌측: 탐사 경로 패널 (Missions Panel) --- */
 .missions-panel {
   display: flex;
   flex-direction: column;
@@ -535,45 +650,59 @@ body::after {
   padding: 10px 12px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: var(--bg-elevated);
+  background: linear-gradient(135deg, var(--bg-elevated), var(--bg-surface-2));
 }
 
 .chapter-icon {
   display: grid;
   place-items: center;
-  height: 32px;
-  width: 32px;
+  height: 34px;
+  width: 34px;
+  flex-shrink: 0;
   border-radius: var(--radius-sm);
-  font-size: 16px;
+  font-size: 17px;
   color: var(--era-tint);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+}
+
+.chapter-flag > div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+
+.chapter-flag small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .chapter-flag strong {
   display: block;
   font-size: 13px;
+  font-weight: 800;
   color: var(--text-main);
-}
-
-.chapter-flag small {
-  color: var(--text-muted);
-  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chapter-flag > span {
   margin-left: auto;
-  color: var(--text-muted);
+  color: var(--era-tint);
   font-size: 15px;
   font-weight: 900;
+  opacity: 0.85;
 }
 
 .chapter-trait {
   margin: 0 12px;
   padding: 7px 10px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(234, 179, 8, 0.22);
+  border: 1px solid rgba(234, 179, 8, 0.24);
   background: rgba(234, 179, 8, 0.07);
-  color: var(--accent-gold-soft);
+  color: var(--era-tint-soft);
   font-size: 11px;
   font-weight: 600;
   line-height: 1.4;
@@ -590,10 +719,9 @@ body::after {
 .chapter-story,
 .chapter-map-link {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 0;
+  gap: 4px;
   padding: 8px 8px;
   width: 100%;
   min-height: 36px;
@@ -603,14 +731,16 @@ body::after {
   color: var(--text-main);
   font-size: 11px;
   font-weight: 700;
-  cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .chapter-story span {
   font-size: 11px;
   font-weight: 700;
-  color: var(--accent-gold-soft);
+  color: var(--era-tint-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chapter-story strong,
@@ -622,7 +752,6 @@ body::after {
 .chapter-map-link:hover {
   background: var(--bg-hover);
   border-color: var(--era-tint);
-  filter: none;
 }
 
 .mission-list {
@@ -630,7 +759,7 @@ body::after {
   gap: 5px;
   display: flex;
   flex-direction: column;
-  max-height: 340px;
+  max-height: 365px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--bg-hover) transparent;
@@ -640,14 +769,15 @@ body::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 41px;
   padding: 6px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   background: var(--bg-base);
-  box-shadow: none;
-  cursor: pointer;
-  transition: all 0.15s;
+  color: var(--text-sub);
+  text-align: left;
+  width: 100%;
+  transition: background 0.14s, border-color 0.14s, transform 0.1s;
 }
 
 .mission-item:hover:not(:disabled) {
@@ -656,10 +786,12 @@ body::after {
 }
 
 .mission-item .mission-index {
-  width: 20px;
+  width: 22px;
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 800;
+  flex-shrink: 0;
+  text-align: center;
 }
 
 .mission-item .mission-copy {
@@ -672,6 +804,7 @@ body::after {
   display: block;
   color: var(--text-main);
   font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -681,15 +814,20 @@ body::after {
   display: block;
   font-size: 10px;
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mission-item .mission-mark {
   font-size: 11px;
   color: var(--text-muted);
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .mission-item.active {
-  background: rgba(234, 179, 8, 0.14);
+  background: linear-gradient(90deg, rgba(234, 179, 8, 0.18), rgba(234, 179, 8, 0.06));
   border-color: var(--era-tint);
   box-shadow: inset 3px 0 0 var(--era-tint);
 }
@@ -705,12 +843,16 @@ body::after {
 }
 
 .mission-item.complete .mission-mark {
-  color: #34d399;
+  color: var(--accent-green-soft);
 }
 
 .mission-item.boss-mission {
   border-color: rgba(245, 158, 11, 0.35);
   background: rgba(245, 158, 11, 0.06);
+}
+
+.mission-item.boss-mission .mission-index {
+  color: var(--accent-gold-soft);
 }
 
 .helper-slots {
@@ -731,7 +873,7 @@ body::after {
   padding: 9px 12px;
   font-weight: 700;
   font-size: 12px;
-  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .helper-summary:hover {
@@ -740,9 +882,9 @@ body::after {
 }
 
 .helper-summary small {
-  color: #6ee7b7;
+  color: var(--accent-green-soft);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .reward-teaser {
@@ -752,22 +894,24 @@ body::after {
   margin: 0 12px;
   border-radius: var(--radius-sm);
   padding: 9px 12px;
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.26);
+  background: rgba(245, 158, 11, 0.07);
 }
 
 .reward-teaser > span {
   color: var(--accent-gold-soft);
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .reward-teaser strong {
   display: block;
   color: var(--accent-gold-soft);
   font-size: 11px;
+  font-weight: 800;
 }
 
 .reward-teaser small {
+  display: block;
   color: var(--text-sub);
   font-size: 10px;
 }
@@ -782,19 +926,14 @@ body::after {
   background: var(--bg-surface);
 }
 
-.battlefield::before {
-  display: none !important;
-}
-
 .field-head {
-  order: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 16px;
+  padding: 11px 16px;
   border-bottom: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.025);
 }
 
 .field-head-left {
@@ -814,29 +953,37 @@ body::after {
 .field-condition {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 700;
-  color: #fca5a5;
-  background: rgba(239, 68, 68, 0.12);
-  padding: 2px 8px;
+  color: var(--accent-red-soft);
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  padding: 2px 9px;
   border-radius: 999px;
+}
+
+.field-condition i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  box-shadow: 0 0 8px var(--accent-red);
 }
 
 .mission-story-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  width: auto;
   min-height: 30px;
-  padding: 4px 10px;
+  padding: 5px 11px;
   border-radius: var(--radius-sm);
   background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  color: var(--accent-gold-soft);
+  border: 1px solid var(--border-strong);
+  color: var(--era-tint-soft);
   font-size: 11px;
-  cursor: pointer;
-  transition: background 0.15s;
+  font-weight: 700;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .mission-story-button:hover {
@@ -849,9 +996,8 @@ body::after {
 }
 
 .combat-top-bar {
-  order: 1;
-  padding: 14px 18px 12px;
-  background: var(--bg-base);
+  padding: 14px 18px 13px;
+  background: rgba(9, 13, 20, 0.75);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -860,17 +1006,15 @@ body::after {
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 9px;
+  flex-wrap: wrap;
 }
 
 .target-chip {
-  position: static;
   display: flex;
   align-items: baseline;
   gap: 8px;
-  padding: 0;
-  background: transparent;
-  border: 0;
+  flex-wrap: wrap;
 }
 
 .target-chip span {
@@ -878,16 +1022,20 @@ body::after {
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.8px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .target-chip strong {
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 900;
   color: var(--text-main);
 }
 
 .target-chip small {
   font-size: 12px;
+  font-weight: 600;
   color: var(--text-muted);
 }
 
@@ -896,51 +1044,78 @@ body::after {
   align-items: baseline;
   gap: 6px;
   font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
-  text-shadow: none;
 }
 
 .health-label strong {
   font-size: 14px;
-  font-weight: 800;
-  color: #fca5a5;
+  font-weight: 900;
+  color: var(--accent-red-soft);
   font-variant-numeric: tabular-nums;
 }
 
 .health-track {
   height: 14px;
-  margin: 0;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.35);
   border-radius: 999px;
-  background: #1e1318;
+  background: #1c1116;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .health-fill {
+  width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #ef4444, #f87171);
+  background: linear-gradient(90deg, #dc2626, #f87171);
   border-radius: 999px;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-  transition: width 0.15s ease-out;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
+  transition: width 0.14s ease-out;
 }
 
 .field-visual {
-  order: 2;
   position: relative;
-  min-height: 390px;
+  min-height: 410px;
   flex: 1;
-  border: 0;
   overflow: hidden;
-}
-
-body[data-era] .field-visual {
+  cursor: pointer;
+  user-select: none;
   background:
-    radial-gradient(circle at 50% 45%, var(--era-halo), transparent 60%),
-    linear-gradient(180deg, var(--era-dark) 0%, #0d1420 100%);
+    radial-gradient(circle at 50% 44%, var(--era-halo), transparent 62%),
+    linear-gradient(180deg, var(--era-dark) 0%, #0b111c 70%, #080c14 100%);
 }
 
-body[data-era] .portal-art {
-  display: none;
+.field-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 60px rgba(5, 9, 16, 0.78);
+}
+
+.celestial-glow {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  background: var(--era-halo);
+  filter: blur(80px);
+  border-radius: 50%;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: celestialBreath 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.portal-art {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  inset: 0;
+  opacity: 0.24;
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 .era-scene-mark {
@@ -949,27 +1124,121 @@ body[data-era] .portal-art {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: clamp(130px, 16vw, 210px);
-  opacity: 0.1;
-  filter: grayscale(0.2);
+  font-size: clamp(135px, 16vw, 215px);
+  opacity: 0.08;
+  filter: grayscale(0.15);
   z-index: 0;
   pointer-events: none;
   user-select: none;
 }
 
 .enemy-halo {
-  top: 50%;
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  transform: translate(-50%, -50%);
+  height: 196px;
+  width: 196px;
+  border-radius: 50%;
+  border: 1px solid var(--era-tint);
+  box-shadow: 0 0 40px var(--era-halo), inset 0 0 45px var(--era-halo);
+  background: radial-gradient(circle, var(--era-halo), transparent 70%);
+  opacity: 0.38;
   z-index: 1;
-  border-color: var(--era-tint);
-  opacity: 0.22;
+  animation: breath 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .enemy-sprite {
-  font-size: 138px;
-  top: 50%;
+  position: absolute;
   z-index: 4;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 18px var(--era-halo));
-  transition: transform 0.08s ease;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  font-size: 138px;
+  line-height: 1;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.72)) drop-shadow(0 0 22px var(--era-halo));
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.09s cubic-bezier(0.22, 1, 0.36, 1), filter 0.1s ease;
+}
+
+.field-visual:hover .enemy-sprite {
+  transform: translate(-50%, -52%) scale(1.04);
+}
+
+.enemy-sprite.hit,
+.field-visual:active .enemy-sprite {
+  transform: translate(-50%, -48%) scale(0.89) rotate(-3deg);
+  filter: brightness(1.85) drop-shadow(0 0 30px var(--era-tint));
+}
+
+.ground-sigil {
+  position: absolute;
+  left: 50%;
+  bottom: 13%;
+  transform: translateX(-50%) rotateX(70deg);
+  border: 2px solid var(--era-tint);
+  box-shadow: 0 0 28px var(--era-halo), inset 0 0 28px var(--era-halo);
+  width: 250px;
+  height: 130px;
+  border-radius: 50%;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.floating-texts {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+}
+
+.damage-pop {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  font-weight: 900;
+  color: #fde68a;
+  font-size: 24px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85), 0 0 12px rgba(245, 158, 11, 0.45);
+  animation: rise 0.72s ease-out forwards;
+  white-space: nowrap;
+}
+
+.damage-pop.heal {
+  color: #6ee7b7;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85), 0 0 12px rgba(16, 185, 129, 0.45);
+}
+
+.damage-pop.gold {
+  color: #fcd34d;
+}
+
+.stage-click-pill {
+  position: absolute;
+  z-index: 5;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: rgba(11, 16, 25, 0.72);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-sub);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+}
+
+.stage-click-pill kbd {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--era-tint-soft);
 }
 
 .seal-caption {
@@ -978,26 +1247,25 @@ body[data-era] .portal-art {
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.28);
-  font-size: 10px;
-  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 9px;
+  letter-spacing: 2.4px;
   font-weight: 800;
   white-space: nowrap;
   pointer-events: none;
 }
 
 .combat-bottom {
-  order: 3;
   padding: 12px 16px;
-  background: var(--bg-base);
+  background: rgba(9, 13, 20, 0.82);
   border-top: 1px solid var(--border-subtle);
-  border-bottom: 0;
 }
 
 .combat-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin: 0 0 8px;
   font-size: 12px;
   color: var(--text-sub);
@@ -1006,6 +1274,7 @@ body[data-era] .portal-art {
 #missionTimer {
   font-weight: 800;
   color: var(--accent-gold-soft);
+  font-variant-numeric: tabular-nums;
 }
 
 .mission-payout {
@@ -1013,15 +1282,16 @@ body[data-era] .portal-art {
   padding: 7px 12px;
   border-radius: var(--radius-sm);
   background: rgba(234, 179, 8, 0.08);
-  border: 1px solid rgba(234, 179, 8, 0.22);
-  color: var(--accent-gold-soft);
+  border: 1px solid rgba(234, 179, 8, 0.24);
+  color: var(--era-tint-soft);
   text-align: center;
   font-size: 12px;
   font-weight: 700;
 }
 
 .battlefield.boss-enraged {
-  border-color: rgba(239, 68, 68, 0.5);
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.18), var(--shadow-card);
 }
 
 .battlefield.boss-enraged .field-head {
@@ -1036,25 +1306,23 @@ body[data-era] .portal-art {
 }
 
 .buttons-card {
-  order: 0;
   padding: 0;
 }
 
 .combat-controls-body {
-  padding: 14px;
+  padding: 13px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 
-/* 깔끔하고 타격감 있는 와이드 공격 버튼 */
+/* 와이드 공격 버튼 */
 .attack-button {
   width: 100%;
-  height: auto;
-  min-height: 76px;
+  min-height: 74px;
   margin: 0;
-  padding: 14px 18px;
-  border: 1px solid rgba(248, 113, 113, 0.45);
+  padding: 13px 16px;
+  border: 1px solid rgba(248, 113, 113, 0.5);
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: row;
@@ -1063,57 +1331,56 @@ body[data-era] .portal-art {
   gap: 12px;
   text-align: left;
   background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22);
   color: #fff;
-  cursor: pointer;
-  transition: transform 0.08s ease, filter 0.12s ease;
-}
-
-.attack-button::before {
-  display: none !important;
+  transition: transform 0.08s ease, filter 0.12s ease, box-shadow 0.12s ease;
 }
 
 .attack-button:hover:not(:disabled) {
-  filter: brightness(1.1);
+  filter: brightness(1.08);
+  box-shadow: 0 8px 22px rgba(220, 38, 38, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .attack-button:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.attack-button:disabled {
-  opacity: 0.45;
-  filter: grayscale(0.7);
-  cursor: not-allowed;
+.attack-button.attack-queued {
+  filter: brightness(1.16);
+  box-shadow: 0 0 0 2px #fde68a, 0 0 20px rgba(245, 158, 11, 0.45);
 }
 
-body[data-era] .attack-symbol {
+.attack-symbol {
   font-size: 34px;
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
-body[data-era] .attack-button > span:nth-child(2) {
+.attack-copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
   flex: 1;
+  min-width: 0;
 }
 
-body[data-era] .attack-button strong {
-  font-family: 'Noto Sans KR', sans-serif;
+.attack-button strong {
   font-weight: 900;
   font-size: 18px;
   letter-spacing: -0.3px;
+  line-height: 1.15;
 }
 
-body[data-era] .attack-button small {
+.attack-button small {
   display: block;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.82);
-  max-width: none;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .attack-button b {
@@ -1121,9 +1388,8 @@ body[data-era] .attack-button small {
   font-weight: 900;
   padding: 5px 10px;
   border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.28);
+  background: rgba(0, 0, 0, 0.32);
   color: #fde68a;
-  margin: 0;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1132,7 +1398,6 @@ body[data-era] .attack-button small {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  padding: 0;
 }
 
 .sub-actions button {
@@ -1140,24 +1405,16 @@ body[data-era] .attack-button small {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 9px;
   width: 100%;
-  height: auto;
-  min-height: 50px;
-  padding: 10px 12px;
+  min-height: 48px;
+  padding: 9px 11px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
-  box-shadow: none;
   color: var(--text-main);
   text-align: left;
-  cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
-}
-
-.sub-actions button:last-child {
-  background: var(--bg-elevated);
-  border-color: var(--border-strong);
 }
 
 .sub-actions button:hover {
@@ -1167,7 +1424,7 @@ body[data-era] .attack-button small {
 
 .sub-actions span {
   font-size: 18px;
-  color: #34d399;
+  color: var(--accent-green-soft);
 }
 
 .sub-actions button:last-child span {
@@ -1193,26 +1450,33 @@ body[data-era] .attack-button small {
   display: block;
   font-size: 11px;
   color: var(--text-sub);
+  font-variant-numeric: tabular-nums;
 }
 
 /* 집중 공격 스킬 버튼 */
 .skill-button {
-  margin: 0;
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid rgba(168, 85, 247, 0.4);
+  padding: 10px 13px;
+  border: 1px solid rgba(168, 85, 247, 0.38);
   border-radius: var(--radius-md);
-  background: rgba(168, 85, 247, 0.14);
+  background: rgba(168, 85, 247, 0.12);
   color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  transition: background 0.15s;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .skill-button:hover {
-  background: rgba(168, 85, 247, 0.24);
+  background: rgba(168, 85, 247, 0.22);
+  border-color: rgba(168, 85, 247, 0.65);
+}
+
+.skill-button.skill-ready {
+  border-color: rgba(192, 132, 252, 0.72);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.24), rgba(126, 34, 206, 0.16));
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.22);
 }
 
 .skill-button > span:first-child {
@@ -1227,6 +1491,7 @@ body[data-era] .attack-button small {
 }
 
 .skill-button small {
+  display: block;
   font-size: 11px;
   color: var(--text-sub);
 }
@@ -1237,6 +1502,103 @@ body[data-era] .attack-button small {
   padding: 2px 7px;
   border-radius: 4px;
   font-size: 11px;
+  color: var(--accent-purple-soft);
+}
+
+/* 전투 소모품 퀵슬롯 (Quick Consumables) */
+.quick-consumables {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+}
+
+.quick-consumables:empty {
+  display: none;
+}
+
+.quick-consumables-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.quick-consumables-more {
+  border: 0;
+  background: transparent;
+  color: var(--era-tint-soft);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0;
+}
+
+.quick-consumables-more:hover {
+  text-decoration: underline;
+}
+
+.elixir-active-pill {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-gold-soft);
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.quick-consumables-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.quick-consumable-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.quick-consumable-btn.has-stock {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+}
+
+.quick-consumable-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--era-tint);
+}
+
+.quick-consumable-btn > span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.quick-consumable-btn strong {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.quick-consumable-btn small {
+  display: block;
+  font-size: 9px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 /* 컴팩트 스태미너 패널 */
@@ -1244,8 +1606,7 @@ body[data-era] .attack-button small {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin: 2px 0 0;
-  padding: 12px;
+  padding: 11px 12px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-base);
@@ -1267,9 +1628,8 @@ body[data-era] .attack-button small {
 }
 
 .stamina-track {
-  height: 8px;
+  height: 7px;
   background: var(--bg-surface);
-  border: 0;
   border-radius: 999px;
   overflow: hidden;
 }
@@ -1283,7 +1643,7 @@ body[data-era] .attack-button small {
 
 .stamina-panel > small {
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 10.5px;
   line-height: 1.35;
 }
 
@@ -1302,12 +1662,12 @@ body[data-era] .attack-button small {
   color: var(--accent-gold-soft);
   font-weight: 700;
   font-size: 11px;
-  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .stamina-supply:not(:disabled):hover {
   background: var(--bg-hover);
-  filter: none;
+  border-color: var(--era-tint);
 }
 
 .stamina-shop-link {
@@ -1318,25 +1678,23 @@ body[data-era] .attack-button small {
   padding: 7px 10px;
   font-size: 11px;
   font-weight: 700;
-  cursor: pointer;
   white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
 }
 
 .stamina-shop-link:hover {
   background: var(--bg-elevated);
   color: #fff;
-  text-decoration: none;
 }
 
 /* --- 우측 하단: 탐사자 상태 및 빠른 지령 --- */
 .stats-card {
-  order: 1;
   padding-bottom: 12px;
 }
 
 .player-level {
-  margin: 12px 14px 6px;
-  padding: 12px;
+  margin: 11px 13px 6px;
+  padding: 11px 12px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
@@ -1350,28 +1708,54 @@ body[data-era] .attack-button small {
   gap: 8px;
 }
 
-.player-level-head { justify-content: space-between; }
+.player-level-head {
+  justify-content: space-between;
+}
+
 .player-level-icon {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: var(--radius-sm);
   background: var(--bg-base);
   color: var(--era-tint);
+  font-size: 13px;
 }
 
-.player-level-name { font-size: 11px; font-weight: 800; color: var(--text-sub); }
-.player-level-rank { white-space: nowrap; font-size: 11px; }
-.player-level-rank b { font-size: 18px; color: var(--era-tint); }
-.player-level-rank strong { font-size: 11px; color: var(--text-muted); }
+.player-level-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-sub);
+}
+
+.player-level-rank {
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.player-level-rank b {
+  font-size: 17px;
+  color: var(--era-tint);
+  margin-left: 2px;
+}
+
+.player-level-rank strong {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-sub);
+}
+
 .player-level .xp-mini {
   display: flex;
   justify-content: space-between;
-  margin: 10px 0 5px;
+  margin: 8px 0 5px;
   font-size: 10px;
   font-weight: 700;
   color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .player-level .level-track {
@@ -1392,22 +1776,21 @@ body[data-era] .attack-button small {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px 4px;
+  padding: 10px 14px 4px;
   font-size: 12px;
   font-weight: 700;
   color: var(--text-sub);
 }
 
 .player-health strong {
-  color: #6ee7b7;
+  color: var(--accent-green-soft);
   font-variant-numeric: tabular-nums;
 }
 
 .player-health-bar {
-  height: 10px;
-  margin: 0 14px 12px;
+  height: 9px;
+  margin: 0 14px 11px;
   border-radius: 999px;
-  border: 0;
   background: var(--bg-base);
   overflow: hidden;
 }
@@ -1423,30 +1806,32 @@ body[data-era] .attack-button small {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   gap: 8px;
-  margin: 0 14px 10px;
+  margin: 0 13px 10px;
 }
 
 .stat-main {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 10px;
+  align-items: center;
+  padding: 10px 8px;
   border-radius: var(--radius-sm);
   background: var(--bg-base);
   border: 1px solid var(--border-subtle);
-  align-items: center;
 }
 
 .stat-main small {
   font-size: 10px;
   color: var(--text-muted);
+  font-weight: 600;
 }
 
 .stat-main strong {
   font-size: 22px;
   font-weight: 900;
   color: var(--accent-gold-soft);
-  text-shadow: none;
+  line-height: 1.15;
+  margin: 2px 0;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1460,7 +1845,6 @@ body[data-era] .attack-button small {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin: 0;
 }
 
 .mini-stats > div {
@@ -1471,6 +1855,7 @@ body[data-era] .attack-button small {
   background: var(--bg-base);
   border-radius: var(--radius-sm);
   padding: 7px 10px;
+  flex: 1;
 }
 
 .mini-stats small {
@@ -1489,17 +1874,22 @@ body[data-era] .attack-button small {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin: 0 14px;
+  margin: 0 13px;
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(234, 179, 8, 0.25);
   background: rgba(234, 179, 8, 0.06);
   text-align: center;
-  color: var(--accent-gold-soft);
+  color: var(--era-tint-soft);
+}
+
+.growth-card.growth-burst {
+  animation: growthBurst 1.65s ease-out;
 }
 
 .growth-card strong {
   font-size: 11px;
+  font-weight: 800;
 }
 
 .growth-card span {
@@ -1514,13 +1904,15 @@ body[data-era] .attack-button small {
 }
 
 .quick-quest {
-  order: 2;
-  padding: 14px;
+  padding: 13px 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
 }
 
 .quick-quest .quest-strap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: var(--era-tint);
   font-size: 11px;
   font-weight: 800;
@@ -1529,46 +1921,92 @@ body[data-era] .attack-button small {
 .quick-quest .quest-title {
   font-size: 13px;
   font-weight: 800;
-  margin-top: 4px;
+  margin: 6px 0 3px;
+  color: var(--text-main);
 }
 
 .quick-quest .quest-desc {
   font-size: 11px;
   color: var(--text-sub);
-}
-
-.quick-quest .quest-foot {
-  font-size: 11px;
-  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 .quest-bar {
   height: 6px;
   border-radius: 999px;
   background: var(--bg-base);
+  margin: 9px 0;
   overflow: hidden;
 }
 
 .quest-bar > div {
+  height: 100%;
   background: linear-gradient(90deg, var(--era-tint), #fbbf24);
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+
+.quick-quest .quest-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .quest-claim {
   background: var(--era-tint);
-  color: #0f172a;
+  color: #090d14;
   border: 0;
   border-radius: var(--radius-sm);
-  padding: 4px 10px;
+  padding: 5px 11px;
+  font-size: 11px;
   font-weight: 800;
-  cursor: pointer;
 }
 
+.quest-claim:hover {
+  filter: brightness(1.08);
+}
+
+/* 하단 상태 안내 바 */
 .bottom-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   margin-top: 14px;
   border: 1px solid var(--border-subtle);
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
   padding: 12px 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.bottom-status > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.status-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--era-tint);
+  font-size: 16px;
+}
+
+.bottom-status > div > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .bottom-status strong {
@@ -1582,27 +2020,43 @@ body[data-era] .attack-button small {
 }
 
 .bottom-status button {
-  color: var(--accent-gold-soft);
+  flex-shrink: 0;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--era-tint-soft);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
   font-weight: 700;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.status-icon {
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-  color: var(--era-tint);
+.bottom-status button:hover {
+  background: var(--bg-hover);
+  border-color: var(--era-tint);
 }
 
 /* ==========================================================================
-   5. 서브 화면 (상점, 동료, 연구, 챕터 브라우저, 리더보드 등)
+   5. 서브 화면 공통 & 카드 그리드 (Secondary Views)
    ========================================================================== */
 .secondary {
-  padding: 4px 0 24px;
+  padding: 2px 0 24px;
+  min-height: 560px;
+}
+
+.secondary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .secondary-header p {
   color: var(--text-sub);
   font-size: 13px;
+  margin: 0;
 }
 
 .secondary-header .section-count {
@@ -1610,21 +2064,36 @@ body[data-era] .attack-button small {
   border-radius: var(--radius-sm);
   background: var(--bg-surface);
   color: var(--text-main);
-  padding: 6px 12px;
+  padding: 7px 13px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.daily-claim-btn {
+  width: auto !important;
+  padding: 8px 16px !important;
 }
 
 .section-label {
   font-size: 13px;
   font-weight: 800;
-  color: var(--accent-gold-soft);
+  color: var(--era-tint-soft);
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-left: 3px solid var(--era-tint);
   border-radius: var(--radius-sm);
   margin: 20px 0 12px;
   padding: 10px 14px;
+}
+
+.store-grid,
+.helper-grid,
+.achievement-grid,
+.codex-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .store-item,
@@ -1641,7 +2110,48 @@ body[data-era] .attack-button small {
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   color: var(--text-main);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.15s, transform 0.12s;
+}
+
+.store-item:hover,
+.helper-card:hover,
+.achievement-card:hover,
+.tech-card:hover,
+.craft-slot:hover {
+  border-color: var(--border-strong);
+}
+
+.item-top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.item-icon {
+  font-size: 24px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.item-top strong {
+  font-size: 14px;
+  font-weight: 800;
+  display: block;
+  color: var(--text-main);
+}
+
+.item-top small {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .store-item p,
@@ -1651,47 +2161,48 @@ body[data-era] .attack-button small {
 .tech-card p {
   color: var(--text-sub);
   font-size: 12px;
-}
-
-.item-top small,
-.helper-role,
-.achievement-card small,
-.codex-card small {
-  color: var(--text-muted);
-}
-
-.item-icon,
-.helper-card .helper-portrait,
-.codex-sprite {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  line-height: 1.65;
+  margin: 10px 0;
+  min-height: 38px;
 }
 
 .item-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
   color: var(--text-sub);
+  font-size: 11px;
 }
 
 .item-meta strong {
   color: var(--accent-gold-soft);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .purchase-button,
 .wide-action {
+  width: 100%;
+  padding: 10px 12px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   background: var(--bg-elevated);
   color: var(--text-main);
-  font-weight: 700;
-  text-shadow: none;
-  cursor: pointer;
-  transition: all 0.15s;
+  font-size: 12px;
+  font-weight: 800;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.purchase-button:hover:not(:disabled) {
+.purchase-button:hover:not(:disabled),
+.wide-action:hover:not(:disabled) {
   background: var(--era-tint);
   border-color: var(--era-tint);
-  color: #0f172a;
+  color: #090d14;
 }
 
 /* 상점 필터 탭 & 요약 */
@@ -1699,7 +2210,7 @@ body[data-era] .attack-button small {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 8px 0 12px;
+  margin: 6px 0 12px;
 }
 
 .shop-filter {
@@ -1711,7 +2222,7 @@ body[data-era] .attack-button small {
   min-height: 38px;
   font-size: 12px;
   font-weight: 700;
-  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .shop-filter:hover {
@@ -1723,7 +2234,6 @@ body[data-era] .attack-button small {
   border-color: var(--era-tint);
   background: rgba(234, 179, 8, 0.15);
   color: #fff;
-  box-shadow: none;
 }
 
 .shop-category-hint {
@@ -1741,7 +2251,7 @@ body[data-era] .attack-button small {
 }
 
 .shop-category-hint strong {
-  color: var(--accent-gold-soft);
+  color: var(--era-tint-soft);
 }
 
 .stamina-shop-summary {
@@ -1759,7 +2269,6 @@ body[data-era] .attack-button small {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
-  color: var(--text-main);
 }
 
 .stamina-shop-summary small {
@@ -1795,16 +2304,53 @@ body[data-era] .attack-button small {
 .shop-advanced summary {
   cursor: pointer;
   font-weight: 700;
-  color: var(--accent-gold-soft);
+  color: var(--era-tint-soft);
 }
 
-/* 연구소 (Technology) */
+.shop-advanced p {
+  margin: 10px 0 0;
+  line-height: 1.75;
+}
+
+/* 동료 카드 (Helpers) */
+.helper-card .helper-portrait {
+  font-size: 46px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, var(--bg-hover), var(--bg-elevated));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.helper-name {
+  font-size: 16px;
+  margin-top: 12px;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.helper-name small {
+  font-size: 12px;
+  color: var(--era-tint);
+  margin-left: 4px;
+}
+
+.helper-role {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* 기술 연구소 (Technology & Modules) */
 .research-overview {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  padding: 16px;
+  padding: 16px 18px;
   margin: 8px 0 16px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -1813,25 +2359,30 @@ body[data-era] .attack-button small {
 
 .research-active {
   flex: 1;
-  min-width: 230px;
+  min-width: 240px;
 }
 
 .research-active h3 {
-  font-size: 18px;
+  font-size: 17px;
   margin: 4px 0;
   color: var(--text-main);
 }
 
+.research-active p {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin: 0;
+}
+
 .research-live {
-  color: #34d399;
+  color: var(--accent-green-soft);
   font-size: 11px;
   font-weight: 800;
 }
 
 .research-meter {
-  height: 10px;
+  height: 9px;
   border-radius: 999px;
-  border: 0;
   background: var(--bg-base);
   margin: 10px 0 6px;
   overflow: hidden;
@@ -1840,19 +2391,36 @@ body[data-era] .attack-button small {
 .research-meter > div {
   height: 100%;
   background: linear-gradient(90deg, #10b981, var(--era-tint));
+  transition: width 0.25s;
+}
+
+.research-idle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.research-idle small {
+  font-size: 12px;
+  color: var(--text-sub);
 }
 
 .research-total {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
   padding: 8px 12px;
   font-size: 12px;
+  font-weight: 700;
   color: var(--text-sub);
 }
 
 .tech-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
   margin: 12px 0 28px;
 }
@@ -1861,8 +2429,7 @@ body[data-era] .attack-button small {
   display: flex;
   flex-direction: column;
   padding: 16px;
-  gap: 10px;
-  min-height: 230px;
+  gap: 8px;
 }
 
 .tech-head {
@@ -1872,9 +2439,14 @@ body[data-era] .attack-button small {
 }
 
 .tech-icon {
-  font-size: 28px;
-  width: 40px;
-  text-align: center;
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
 }
 
 .tech-head h3 {
@@ -1885,34 +2457,118 @@ body[data-era] .attack-button small {
 
 .tech-head small {
   font-size: 10px;
+  font-weight: 700;
   color: var(--era-tint);
 }
 
 .tech-benefit {
-  color: #6ee7b7;
+  color: var(--accent-green-soft);
   font-size: 11px;
   font-weight: 700;
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(16, 185, 129, 0.09);
   border: 1px solid rgba(16, 185, 129, 0.25);
   border-radius: var(--radius-sm);
-  padding: 8px 10px;
+  padding: 7px 10px;
 }
 
 .tech-cost {
   font-size: 11px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--text-sub);
+  margin-top: auto;
+  padding-top: 6px;
 }
 
 .tech-card.researched {
-  border-color: rgba(16, 185, 129, 0.4);
+  border-color: rgba(16, 185, 129, 0.42);
+  background: linear-gradient(160deg, rgba(16, 185, 129, 0.06), var(--bg-surface));
 }
 
 .tech-card.tech-locked {
   opacity: 0.55;
 }
 
-/* 챕터 & 미션 브라우저 */
+/* Feature Card (오토클리커, 캐러밴, 정예 토벌, 일일 의뢰) */
+.feature-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+}
+
+.feature-icon {
+  font-size: 38px;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.feature-card > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.feature-card h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.feature-card p {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+.feature-card strong {
+  font-size: 12px;
+  color: var(--era-tint-soft);
+}
+
+.feature-card small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.feature-card > .purchase-button {
+  width: auto;
+  min-width: 150px;
+  flex-shrink: 0;
+}
+
+.special-card {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), var(--bg-surface));
+}
+
+.progress-stat {
+  height: 8px;
+  background: var(--bg-base);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-stat > div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--era-tint), #10b981);
+  border-radius: 999px;
+  transition: width 0.25s;
+}
+
+/* 챕터 & 미션 브라우저 (Chapter Browser) */
+.chapter-browser {
+  padding: 0 0 28px;
+}
+
 .chapter-browser-summary {
   display: flex;
   align-items: center;
@@ -1925,8 +2581,15 @@ body[data-era] .attack-button small {
   background: var(--bg-surface);
 }
 
+.chapter-browser-summary .section-label {
+  display: inline-block;
+  margin: 0 0 6px;
+  padding: 3px 9px;
+  font-size: 10px;
+}
+
 .chapter-browser-summary h2 {
-  margin: 4px 0;
+  margin: 2px 0 4px;
   color: var(--text-main);
   font-size: 20px;
 }
@@ -1941,11 +2604,17 @@ body[data-era] .attack-button small {
   white-space: nowrap;
   color: var(--accent-gold-soft);
   font-size: 26px;
+  font-weight: 900;
+}
+
+.chapter-browser-summary > strong small {
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 .chapter-browser-layout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: 270px minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -1961,6 +2630,7 @@ body[data-era] .attack-button small {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
+  scrollbar-width: thin;
 }
 
 .chapter-pick {
@@ -1975,7 +2645,7 @@ body[data-era] .attack-button small {
   border-radius: var(--radius-sm);
   background: var(--bg-base);
   color: var(--text-sub);
-  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .chapter-pick:hover {
@@ -1988,6 +2658,51 @@ body[data-era] .attack-button small {
   background: rgba(234, 179, 8, 0.12);
   color: #fff;
   box-shadow: inset 3px 0 0 var(--era-tint);
+}
+
+.chapter-pick-icon {
+  font-size: 22px;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.chapter-pick > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.chapter-pick small {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.chapter-pick strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chapter-pick em {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--era-tint-soft);
+  flex-shrink: 0;
+}
+
+.chapter-pick.cleared em {
+  color: var(--accent-green-soft);
+}
+
+.chapter-browser-detail {
+  min-width: 0;
 }
 
 .chapter-detail-hero {
@@ -2012,6 +2727,31 @@ body[data-era] .attack-button small {
   font-size: 34px;
 }
 
+.chapter-detail-hero small {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--era-tint);
+}
+
+.chapter-detail-hero h2 {
+  margin: 4px 0 6px;
+  font-size: 20px;
+  color: var(--text-main);
+}
+
+.chapter-detail-hero p {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--text-sub);
+  line-height: 1.65;
+}
+
+.chapter-detail-progress {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--era-tint-soft);
+}
+
 .chapter-browser-guide {
   margin: 12px 0;
   padding: 12px 14px;
@@ -2033,20 +2773,68 @@ body[data-era] .attack-button small {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-height: 180px;
+  min-height: 182px;
   padding: 16px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
 }
 
+.chapter-mission-card.cleared {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: linear-gradient(160deg, rgba(16, 185, 129, 0.06), var(--bg-surface));
+}
+
 .chapter-mission-card.focused {
   border-color: var(--era-tint);
+  box-shadow: 0 0 0 1px var(--era-tint);
+}
+
+.chapter-mission-card.locked {
+  opacity: 0.55;
 }
 
 .chapter-mission-card.boss {
-  border-color: rgba(245, 158, 11, 0.4);
-  background: linear-gradient(145deg, rgba(245, 158, 11, 0.08), var(--bg-surface));
+  border-color: rgba(245, 158, 11, 0.42);
+  background: linear-gradient(145deg, rgba(245, 158, 11, 0.09), var(--bg-surface));
+}
+
+.chapter-mission-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  font-size: 10px;
+}
+
+.chapter-mission-num {
+  font-weight: 900;
+  color: var(--era-tint-soft);
+}
+
+.chapter-mission-state {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.chapter-mission-card h3 {
+  margin: 2px 0 0;
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.chapter-mission-card small {
+  font-size: 11px;
+  color: var(--era-tint);
+  font-weight: 600;
+}
+
+.chapter-mission-card p {
+  flex: 1;
+  margin: 4px 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-sub);
 }
 
 .chapter-mission-card button {
@@ -2058,16 +2846,16 @@ body[data-era] .attack-button small {
   color: var(--text-main);
   font-size: 12px;
   font-weight: 700;
-  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .chapter-mission-card button:hover:not(:disabled) {
   background: var(--era-tint);
   border-color: var(--era-tint);
-  color: #0f172a;
+  color: #090d14;
 }
 
-/* 장비 & 제작 슬롯 */
+/* 장비 & 보급상자 (Inventory & Craft Slots) */
 .craft-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2080,17 +2868,46 @@ body[data-era] .attack-button small {
   align-items: center;
   gap: 8px;
   text-align: center;
-  min-height: 170px;
+  min-height: 175px;
   padding: 16px 14px;
 }
 
 .craft-slot-head {
   width: 100%;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--era-tint);
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border-subtle);
+}
+
+.craft-slot-icon {
+  font-size: 34px;
+  line-height: 1.15;
+  margin: 4px 0;
+}
+
+.craft-slot p {
+  margin: 2px 0 6px;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.craft-actions {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.craft-actions .purchase-button {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+}
+
+.secondary-buy {
+  background: var(--bg-base);
 }
 
 .gear-list {
@@ -2107,6 +2924,14 @@ body[data-era] .attack-button small {
   min-height: 68px;
 }
 
+.gear-row.uncommon { border-color: rgba(16, 185, 129, 0.4); }
+.gear-row.rare { border-color: rgba(56, 189, 248, 0.45); }
+.gear-row.epic { border-color: rgba(168, 85, 247, 0.5); }
+.gear-row.legendary {
+  border-color: rgba(245, 158, 11, 0.6);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), var(--bg-surface));
+}
+
 .gear-avatar {
   display: grid;
   place-items: center;
@@ -2118,37 +2943,381 @@ body[data-era] .attack-button small {
   font-size: 24px;
 }
 
+.gear-detail {
+  flex: 1;
+  min-width: 120px;
+}
+
+.gear-detail strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.gear-detail small {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+.gear-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .tiny-btn {
-  padding: 6px 10px;
+  padding: 7px 11px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   background: var(--bg-elevated);
   color: var(--text-main);
   font-size: 11px;
   font-weight: 700;
-  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .tiny-btn:hover:not(:disabled) {
   background: var(--bg-hover);
+  border-color: var(--era-tint);
 }
 
 .tiny-btn.danger {
   border-color: rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+  color: var(--accent-red-soft);
 }
 
-/* 프레스티지 & 리더보드 */
+.tiny-btn.danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: var(--accent-red);
+}
+
+.empty-slot {
+  padding: 28px 18px;
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* 임무 & 업적 (Quests & Achievements) */
+.quest-active-panel {
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.quest-active-panel .panel-head {
+  padding: 0 0 12px;
+  background: transparent;
+}
+
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  background: var(--bg-elevated);
+}
+
+.quest-item > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.quest-item > div:nth-child(2) > strong {
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.quest-item p {
+  color: var(--text-sub);
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
+.quest-item > .purchase-button {
+  width: auto;
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.quest-all-done {
+  color: var(--text-sub);
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+.achievement-card .achieve-icon {
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.achievement-card h3 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.achievement-card.done {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.achievement-card.claimed {
+  opacity: 0.68;
+}
+
+/* 투기장 (Arena) */
+.arena-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 14px;
+}
+
+.arena-stage {
+  min-height: 300px;
+  background: radial-gradient(ellipse at center, var(--era-dark), var(--bg-surface) 70%);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.arena-stage .arena-opponent {
+  font-size: 92px;
+  margin: 14px 0;
+}
+
+.arena-stage strong {
+  font-size: 19px;
+}
+
+.arena-stage small {
+  color: var(--text-sub);
+  margin-top: 6px;
+}
+
+.arena-info {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.arena-info h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.arena-info p {
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.9;
+  margin: 0 0 18px;
+}
+
+.arena-info .purchase-button {
+  margin-top: auto;
+}
+
+.notice-box {
+  margin-top: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  color: var(--text-sub);
+  background: var(--bg-surface);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+/* 탐사 도감 (Codex) */
+.codex-card.locked {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.codex-sprite {
+  height: 112px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, var(--bg-hover), var(--bg-elevated) 70%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 64px;
+  margin-bottom: 10px;
+}
+
+.codex-card h3 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.codex-card small {
+  color: var(--era-tint);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.era-chronicle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.chronicle-era {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  opacity: 0.5;
+  text-align: center;
+}
+
+.chronicle-era.reached {
+  opacity: 1;
+  border-color: var(--era-tint);
+}
+
+.chronicle-era > span {
+  font-size: 32px;
+}
+
+.chronicle-era strong {
+  font-size: 12px;
+  color: var(--text-main);
+}
+
+.chronicle-era small {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* 프레스티지 & 리더보드 (Prestige & Leaderboard) */
 .prestige-hero,
 .leaderboard-hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 24px;
+  padding: 22px 24px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  background: var(--bg-surface);
+  background: linear-gradient(135deg, var(--bg-surface-2), var(--bg-surface));
+}
+
+.prestige-emblem {
+  font-size: 64px;
+  color: var(--accent-gold-soft);
+  flex-shrink: 0;
+}
+
+.prestige-hero > div:nth-child(2) {
+  flex: 1;
+}
+
+.prestige-hero h2,
+.leaderboard-hero h2 {
+  margin: 4px 0 6px;
+  font-size: 20px;
+  color: var(--text-main);
+}
+
+.prestige-hero p,
+.leaderboard-hero p {
+  margin: 3px 0;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.prestige-hero > div:nth-child(2) > strong {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--accent-gold-soft);
+  margin: 4px 0;
+}
+
+.prestige-hero > .purchase-button {
+  width: auto;
+  min-width: 160px;
+  flex-shrink: 0;
+}
+
+.prestige-perks .craft-slot {
+  min-height: 205px;
+}
+
+.leaderboard-shell {
+  max-width: 960px;
+  margin: 4px auto 26px;
+  color: var(--text-main);
+}
+
+.leaderboard-refresh {
+  flex-shrink: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 10px 14px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.leaderboard-refresh:hover {
+  background: var(--bg-hover);
+  border-color: var(--era-tint);
+}
+
+.leaderboard-my-rank {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  border-radius: var(--radius-md);
+  margin: 14px 0;
+  padding: 13px 18px;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.leaderboard-my-rank strong {
+  font-size: 18px;
+  color: var(--accent-gold-soft);
+}
+
+.leaderboard-my-rank span {
+  margin-left: auto;
+  color: var(--text-sub);
+  font-size: 12px;
+}
+
+.leaderboard-my-rank.guest {
+  justify-content: space-between;
+}
+
+.leaderboard-my-rank.guest span {
+  margin-left: 0;
+}
+
+.leaderboard-my-rank button {
+  background: var(--era-tint);
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: #090d14;
+  padding: 8px 14px;
+  font-weight: 800;
+  font-size: 12px;
 }
 
 .leaderboard-table {
@@ -2161,7 +3330,7 @@ body[data-era] .attack-button small {
 .leaderboard-columns,
 .leaderboard-row {
   display: grid;
-  grid-template-columns: 68px minmax(0, 1fr) 96px 170px;
+  grid-template-columns: 72px minmax(0, 1fr) 96px 170px;
   align-items: center;
   gap: 8px;
   padding: 12px 18px;
@@ -2176,10 +3345,14 @@ body[data-era] .attack-button small {
 }
 
 .leaderboard-row {
-  min-height: 54px;
+  min-height: 52px;
   border-bottom: 1px solid var(--border-subtle);
   font-size: 13px;
   background: var(--bg-surface);
+}
+
+.leaderboard-row:last-child {
+  border-bottom: 0;
 }
 
 .leaderboard-row.mine {
@@ -2187,23 +3360,113 @@ body[data-era] .attack-button small {
   box-shadow: inset 3px 0 0 var(--era-tint);
 }
 
+.board-rank {
+  font-weight: 900;
+  color: var(--text-sub);
+  font-size: 12px;
+}
+
+.board-rank.top-rank {
+  font-size: 20px;
+}
+
+.board-name {
+  font-weight: 800;
+  color: var(--text-main);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.board-name small {
+  margin-left: 8px;
+  background: var(--era-tint);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #090d14;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.board-level {
+  font-size: 12px;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+
+.board-power {
+  font-size: 14px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-gold-soft);
+}
+
+.leaderboard-loading,
+.leaderboard-empty {
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
 /* ==========================================================================
-   6. 모달, 승리 화면, 튜토리얼, 계정 오버레이
+   6. 모달, 승리 화면, 튜토리얼, 계정 오버레이, 토스트
    ========================================================================== */
+.modal-root {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 10, 16, 0.82);
+  backdrop-filter: blur(8px);
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
 .modal-card {
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow: auto;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
+  padding: 28px;
+  text-align: center;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
+  color: var(--text-main);
+}
+
+.modal-crest {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.modal-overline {
+  color: var(--era-tint);
+  font-size: 10px;
+  letter-spacing: 2.2px;
+  font-weight: 900;
+}
+
+.modal-card h2 {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 8px 0 8px;
   color: var(--text-main);
 }
 
 .modal-card p {
   color: var(--text-sub);
+  font-size: 13px;
+  line-height: 1.8;
 }
 
-.modal-overline {
-  color: var(--era-tint);
+.modal-rewards {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 20px 0;
 }
 
 .modal-rewards span {
@@ -2211,6 +3474,17 @@ body[data-era] .attack-button small {
   background: var(--bg-elevated);
   border-radius: var(--radius-sm);
   color: var(--accent-gold-soft);
+  padding: 9px 13px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 22px;
 }
 
 .modal-actions button,
@@ -2218,9 +3492,16 @@ body[data-era] .attack-button small {
   border: 0;
   border-radius: var(--radius-sm);
   background: var(--era-tint);
-  color: #0f172a;
+  color: #090d14;
   font-weight: 800;
-  cursor: pointer;
+  font-size: 13px;
+  padding: 11px 22px;
+  transition: filter 0.15s;
+}
+
+.modal-actions button:hover,
+.modal-primary:hover {
+  filter: brightness(1.08);
 }
 
 .modal-actions .modal-secondary {
@@ -2229,15 +3510,34 @@ body[data-era] .attack-button small {
   color: var(--text-main);
 }
 
+.modal-danger-zone {
+  margin-top: 22px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+}
+
+.modal-danger-link {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--accent-red-soft) !important;
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+}
+
+.modal-danger-btn {
+  background: var(--accent-red) !important;
+  color: #fff !important;
+}
+
 .victory-modal {
-  width: min(680px, 100%);
+  width: min(640px, 100%);
   max-height: 92vh;
   padding: 0;
   overflow: auto;
 }
 
 .victory-era-panel {
-  min-height: 200px;
+  min-height: 185px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2252,13 +3552,128 @@ body[data-era] .attack-button small {
 }
 
 .victory-era-panel .victory-era-icon {
-  font-size: 72px;
-  line-height: 1.15;
+  font-size: 68px;
+  line-height: 1.1;
+}
+
+.victory-era-panel span {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--era-tint);
+  letter-spacing: 1px;
+}
+
+.victory-era-panel strong {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.victory-era-panel small {
+  font-size: 11px;
+  color: var(--text-sub);
 }
 
 .victory-detail {
   padding: 20px 24px 24px;
   background: var(--bg-surface);
+}
+
+/* 스토리 모달 블록 */
+.story-weapon,
+.story-epilogue,
+.story-incident,
+.story-locked {
+  margin: 14px 0;
+  padding: 13px 15px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  font-size: 12px;
+  text-align: left;
+}
+
+.story-weapon {
+  text-align: center;
+  border-color: rgba(234, 179, 8, 0.3);
+  background: rgba(234, 179, 8, 0.08);
+  color: var(--era-tint-soft);
+}
+
+.story-incident > strong,
+.story-epilogue > strong {
+  display: block;
+  font-size: 13px;
+  color: var(--era-tint-soft);
+  margin-bottom: 4px;
+}
+
+.story-incident p,
+.story-epilogue p {
+  font-size: 12px;
+  line-height: 1.75;
+  margin: 4px 0 0;
+  color: var(--text-sub);
+}
+
+.story-locked {
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.theme-select {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.theme-option {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.theme-option span {
+  font-size: 28px;
+}
+
+.theme-option strong {
+  font-size: 11px;
+}
+
+.theme-option.selected {
+  border-color: var(--era-tint);
+  background: rgba(234, 179, 8, 0.14);
+}
+
+.test-tools-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.test-tools-actions button {
+  width: 100%;
+  min-height: 44px;
+}
+
+.test-tools-note {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  font-size: 11px;
+  color: var(--text-sub);
+  line-height: 1.7;
 }
 
 /* 튜토리얼 카드 */
@@ -2279,10 +3694,145 @@ body[data-era] .attack-button small {
   padding: 18px;
   border: 1px solid var(--era-tint);
   border-radius: var(--radius-lg);
-  background: rgba(19, 27, 38, 0.96);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  background: rgba(17, 24, 36, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65);
   color: var(--text-main);
+}
+
+.tutorial-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  font-weight: 900;
+  color: var(--era-tint);
+}
+
+.tutorial-topline button {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  font-size: 12px;
+  padding: 2px 10px;
+}
+
+.tutorial-track {
+  display: flex;
+  gap: 4px;
+  margin: 10px 0 12px;
+}
+
+.tutorial-track i {
+  height: 5px;
+  flex: 1;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+}
+
+.tutorial-track i.filled {
+  background: var(--era-tint);
+  border-color: var(--era-tint);
+}
+
+.tutorial-card h3 {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+
+.tutorial-card p {
+  font-size: 12px;
+  color: var(--text-sub);
+  line-height: 1.65;
+  margin: 0 0 12px;
+}
+
+.tutorial-goal {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  padding: 9px 12px;
+  color: var(--era-tint-soft);
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.tutorial-goal span:last-child {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.tutorial-goal.complete {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-green-soft);
+}
+
+.tutorial-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.tutorial-controls button {
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  font-size: 11px;
+  font-weight: 800;
+  min-height: 34px;
+}
+
+.tutorial-quiet {
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.tutorial-move {
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text-main);
+}
+
+.tutorial-primary {
+  border: 0;
+  background: var(--era-tint);
+  color: #090d14;
+  margin-left: auto;
+}
+
+.tutorial-mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 11px;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--era-tint);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tutorial-mini button {
+  border: 0;
+  background: var(--era-tint);
+  color: #090d14;
+  border-radius: var(--radius-sm);
+  padding: 6px 11px;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .tutorial-highlight {
@@ -2293,15 +3843,15 @@ body[data-era] .attack-button small {
   box-shadow: 0 0 0 6px rgba(234, 179, 8, 0.25) !important;
 }
 
-/* 계정 다이얼로그 */
+/* 계정 다이얼로그 (Account Overlay) */
 .account-overlay {
   position: fixed;
   inset: 0;
   z-index: 60;
   display: grid;
   place-items: center;
-  background: rgba(8, 12, 18, 0.82);
-  backdrop-filter: blur(6px);
+  background: rgba(6, 10, 16, 0.82);
+  backdrop-filter: blur(8px);
   padding: 16px;
 }
 
@@ -2315,6 +3865,74 @@ body[data-era] .attack-button small {
   color: var(--text-main);
 }
 
+.account-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.account-head small {
+  font-size: 10px;
+  color: var(--era-tint);
+  letter-spacing: 1.5px;
+  font-weight: 900;
+}
+
+.account-head h2 {
+  margin: 4px 0 0;
+  font-size: 21px;
+  color: var(--text-main);
+}
+
+.account-head > button {
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text-sub);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  font-weight: 800;
+}
+
+.account-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.account-mode-tabs button {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  color: var(--text-sub);
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.account-mode-tabs button.on {
+  border-color: var(--era-tint);
+  background: rgba(234, 179, 8, 0.14);
+  color: #fff;
+}
+
+.account-field {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.account-field span {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-sub);
+  margin-bottom: 5px;
+}
+
 .account-field input {
   width: 100%;
   padding: 11px 12px;
@@ -2325,58 +3943,166 @@ body[data-era] .attack-button small {
   font-size: 13px;
 }
 
+.account-field input:focus {
+  outline: 2px solid var(--era-tint);
+  border-color: transparent;
+}
+
+.account-error {
+  min-height: 18px;
+  color: var(--accent-red-soft);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 6px 0;
+}
+
 .account-submit {
-  margin-top: 10px;
+  margin-top: 6px;
   width: 100%;
   padding: 12px;
   background: var(--era-tint);
   border: 0;
   border-radius: var(--radius-sm);
-  color: #0f172a;
+  color: #090d14;
   font-weight: 800;
   font-size: 13px;
-  cursor: pointer;
 }
 
-.gold-icon {
-  display: inline-flex;
+.account-footnote {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  text-align: center;
+  margin: 16px 0 0;
+}
+
+.account-profile-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  padding: 18px;
+}
+
+.account-profile-card > span {
+  color: var(--era-tint);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.account-profile-card h3 {
+  font-size: 22px;
+  margin: 6px 0 4px;
+  color: var(--text-main);
+}
+
+.account-profile-card p {
+  color: var(--text-sub);
+  font-size: 12px;
+  margin: 0;
+}
+
+.account-profile-card > div {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  width: 1.5em;
-  height: 1.5em;
-  min-width: 1.5em;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #fde047, #d97706);
-  color: #451a03 !important;
-  font-family: Arial, sans-serif !important;
-  font-size: 0.72em;
-  font-weight: 900;
-  line-height: 1;
-  vertical-align: middle;
+  gap: 8px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
+  margin-top: 14px;
+  font-size: 12px;
+}
+
+.account-profile-card strong {
+  font-size: 18px;
+  color: var(--accent-gold-soft);
+}
+
+.account-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.account-actions button {
+  flex: 1;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--era-tint);
+  color: #090d14;
+  padding: 11px 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.account-actions button.muted {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--text-main);
+}
+
+/* 토스트 알림 (Toast Layer) */
+.toast-layer {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: rgba(21, 31, 46, 0.96);
+  border: 1px solid var(--border-strong);
+  border-left: 4px solid var(--era-tint);
+  color: var(--text-main);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  animation: toastIn 0.2s ease-out;
+}
+
+.toast.gold-toast {
+  border-color: rgba(245, 158, 11, 0.55);
+  border-left-color: var(--accent-gold);
+  color: var(--accent-gold-soft);
 }
 
 .footer {
   color: var(--text-muted);
   font-size: 11px;
   text-align: center;
-  padding: 20px 0 8px;
+  padding: 22px 0 8px;
+}
+
+.footer span {
+  padding: 0 6px;
 }
 
 /* ==========================================================================
-   7. 반응형 레이아웃 (태블릿 / 모바일)
+   7. 반응형 레이아웃 (Desktop Compact / Tablet / Mobile)
    ========================================================================== */
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
   .battle-grid {
-    grid-template-columns: 220px minmax(320px, 1fr) 290px;
-    gap: 10px;
+    grid-template-columns: 236px minmax(330px, 1fr) 304px;
+    gap: 12px;
+  }
+
+  .store-grid,
+  .helper-grid,
+  .achievement-grid,
+  .codex-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 920px) {
   .topbar {
-    height: auto;
-    min-height: 50px;
-    padding: 8px 12px;
+    min-height: 54px;
+    padding: 8px 14px;
     flex-wrap: wrap;
     gap: 8px;
   }
@@ -2387,7 +4113,7 @@ body[data-era] .attack-button small {
 
   .topbar .top-resource {
     min-width: 0;
-    padding: 4px 8px;
+    padding: 5px 9px;
   }
 
   .topbar .top-resource small {
@@ -2398,18 +4124,8 @@ body[data-era] .attack-button small {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .main-nav > .nav-item {
-    font-size: 12px;
-    padding: 0 8px;
-  }
-
-  .main-nav > .nav-item b,
-  .main-nav > .nav-item > span:last-child:not(:first-child) {
-    display: none;
-  }
-
   .more-nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .battle-grid {
@@ -2430,7 +4146,8 @@ body[data-era] .attack-button small {
     order: 2;
   }
 
-  .chapter-browser-layout {
+  .chapter-browser-layout,
+  .arena-layout {
     grid-template-columns: 1fr;
   }
 
@@ -2439,9 +4156,21 @@ body[data-era] .attack-button small {
     max-height: none;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .feature-card,
+  .prestige-hero,
+  .leaderboard-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .feature-card > .purchase-button,
+  .prestige-hero > .purchase-button {
+    width: 100%;
+  }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 560px) {
   .shell {
     padding: 0 10px;
     margin-top: 10px;
@@ -2449,7 +4178,8 @@ body[data-era] .attack-button small {
 
   .topbar .top-resource:nth-child(4),
   .save-indicator,
-  .test-tools-button span {
+  .test-tools-button span,
+  .brand-overline {
     display: none;
   }
 
@@ -2457,12 +4187,9 @@ body[data-era] .attack-button small {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .main-nav > .nav-item {
-    min-height: 34px;
-    font-size: 11px;
+  .main-nav > .nav-more {
+    grid-column: 1 / -1;
   }
-
-  .main-nav > .nav-more { grid-column: 1 / -1; }
 
   .more-nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2480,172 +4207,42 @@ body[data-era] .attack-button small {
   }
 
   .field-visual {
-    min-height: 300px;
+    min-height: 310px;
   }
 
   .enemy-sprite {
-    font-size: 108px;
+    font-size: 112px;
   }
 
+  .store-grid,
+  .helper-grid,
+  .achievement-grid,
+  .codex-grid,
   .craft-grid,
   .chapter-mission-grid,
   .stamina-shop-summary {
     grid-template-columns: 1fr;
   }
+
+  .quest-item,
+  .gear-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .quest-item > .purchase-button,
+  .gear-actions {
+    width: 100%;
+  }
+
+  .gear-actions button {
+    flex: 1;
+  }
+
+  .leaderboard-columns,
+  .leaderboard-row {
+    grid-template-columns: 42px minmax(0, 1fr) 54px 104px;
+    padding: 10px 12px;
+    font-size: 11px;
+  }
 }
-
-
-/* Compatibility styling for UI components used by existing game.js/account.js.
-   Only selectors missing from the clean redesign are restored here. */
-
-.story-weapon,
-.story-epilogue {border:1px solid #7b956c;padding:11px;margin:12px auto;background:#304537;color:#f4e9c4;font-size:12px}.research-idle small {font-size:11px;color:#c8d6c0}
-.research-idle {flex:1;display:flex;flex-direction:column;gap:7px;font-size:16px}
-.era-chronicle {display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px;margin-top:12px}
-.story-incident,
-.story-locked {margin:15px 0;padding:13px;border:1px solid var(--border-subtle);background:#253c2e;color:#f8eac6;text-align:left}
-.story-incident>strong,
-.story-epilogue>strong {font-size:13px;color:#f1d78c}.story-incident p,
-.story-epilogue p {font-size:12px;line-height:1.8;margin:5px 0;color:#e7e8cf}
-.story-intro {line-height:1.9!important}.story-locked {color:#c9d4c2;font-size:11px;text-align:center}
-.chronicle-era {display:flex;align-items:center;flex-direction:column;gap:5px;padding:12px 7px;border:1px solid var(--border-subtle);background:#2b3d32;opacity:.5;text-align:center}
-.chronicle-era.reached {opacity:1;border-color:#a8a273}.chronicle-era>span {font-size:35px}.chronicle-era strong {font-size:11px}.chronicle-era small {font-size:9px;color:#c2d2b6}
-.banner-sigil {height:61px;width:61px;border:3px solid #748f6f;display:grid;place-items:center;font-size:44px;color:#bbde94;transform:rotate(45deg);text-shadow:0 0 18px #9fee96;box-shadow:0 0 15px #a8c57f55,inset 0 0 14px #9de08d33}
-.banner-sigil::first-letter {transform:rotate(-45deg)}
-.banner-wordmark {text-align:center;line-height:1.05;display:flex;flex-direction:column;align-items:center}
-.banner-wordmark small {font-size:8px;letter-spacing:4px;color:#c9dba9;font-weight:900}
-.banner-wordmark strong {font-family:'Black Han Sans',sans-serif;font-weight:400;letter-spacing:4px;font-size:40px;color:#dce8b6;text-shadow:0 3px #192418,0 0 8px #93c87b,0 0 23px #97d38685;-webkit-text-stroke:1px #709f63}
-.banner-wordmark strong span {color:var(--retro-glow)}
-.banner-wordmark>span {font-size:8px;letter-spacing:3px;color:#9cac86}
-.banner-wordmark>span b {color:#d4c287}
-.banner-right {position:absolute;right:23px;display:flex;flex-direction:column;gap:5px;text-align:right;color:#afbd99;font-size:10px;font-weight:900;transform:rotate(-8deg)}
-.banner-right small {color:#8eab8f;font-size:8px}
-.helper-slot {display:flex;align-items:center;gap:7px;width:100%;height:49px;padding:5px;border:1px solid var(--border-subtle);border-radius:2px;color:#d9e3c9;background:linear-gradient(120deg,#25382c,#3c493a);text-align:left;box-shadow:inset 0 2px 8px #0006}
-.helper-slot-icon {display:grid;place-items:center;flex:0 0 34px;height:34px;border:1px solid #688066;background:#1a2924;color:#a2b29b;font-size:21px}
-.helper-slot>span:last-child {display:flex;flex-direction:column;gap:2px;min-width:0}
-.helper-slot strong {font-size:10px;white-space:nowrap}.helper-slot small {font-size:8px;color:#bac5a8;white-space:nowrap}
-.helper-slot.locked {filter:saturate(.35);opacity:.78}.helper-slot.hired {border-color:#b4b57b;background:linear-gradient(#627c5e,#334c39)}
-.helper-slot:hover {filter:brightness(1.2)}
-.growth-card.growth-burst {animation:growthBurst 1.65s ease-out}
-.victory-art-frame {width:100%;aspect-ratio:16/9;overflow:hidden;background:#1c302b;border-bottom:1px solid var(--border-subtle)}
-.victory-art-frame img {display:block;width:100%;height:100%;object-fit:cover;object-position:center}body[data-theme=cyber] .victory-art-frame {border-color:#b17ea8}body[data-theme=cosmos] .victory-art-frame {border-color:#9298c8}
-.tutorial-topline {display:flex;justify-content:space-between;align-items:center;font-size:9px;letter-spacing:1.8px;font-weight:900;color:#e6d298}
-.tutorial-topline button {border:1px solid var(--border-subtle);border-radius:3px;background:#2c4733;color:#e6f3d2;font-size:12px;padding:2px 10px}
-.tutorial-track {display:flex;gap:4px;margin:12px 0 14px}.tutorial-track i {height:5px;flex:1;border:1px solid #59745b;background:#172b21;border-radius:4px}.tutorial-track i.filled {background:linear-gradient(#f9e7a3,#b99a53);border-color:#d6c18b}
-.tutorial-goal {display:flex;flex-direction:column;gap:4px;border:1px solid var(--border-subtle);background:#263f2d;padding:9px 11px;color:#f3dca6;font-size:11px;font-weight:800;margin-bottom:12px}.tutorial-goal span:last-child {font-size:9px;color:#c5d4ad;font-weight:500}.tutorial-goal.complete {border-color:#9fbd7c;background:#3b593b;color:#e2ffd3}
-.tutorial-controls {display:flex;flex-wrap:wrap;gap:6px;align-items:center}.tutorial-controls button {border-radius:3px;padding:8px 10px;font-size:10px;font-weight:900;min-height:32px}.tutorial-quiet {border:1px solid #7a8474;background:transparent;color:#ccd2b4}.tutorial-move {border:1px solid var(--border-subtle);background:linear-gradient(#627963,#334e3d);color:#e9f3d8}.tutorial-primary {border:1px solid var(--border-subtle);background:linear-gradient(#e5d59e,#a68c54);color:#2b2c1f;margin-left:auto}
-.tutorial-mini {display:flex;align-items:center;justify-content:space-between;gap:11px;background:linear-gradient(#617450,#314634);color:#fff2cf;border:1px solid var(--border-subtle);border-radius:5px;padding:9px 13px;box-shadow:0 8px 28px #000b;font-size:11px;font-weight:900}
-.tutorial-mini button {border:1px solid var(--border-subtle);background:#e9dba5;color:#2d3528;border-radius:3px;padding:6px 10px;font-size:10px;font-weight:900}
-.balance-advice {display:flex;align-items:center;gap:12px;margin:2px 0 14px;padding:12px 14px;border:1px solid var(--border-subtle);background:linear-gradient(100deg,#514b31,#293a2d);box-shadow:inset 0 0 12px #0003;color:#efe7be}
-.balance-advice-icon {font-size:27px}.balance-advice>div {flex:1;min-width:0}.balance-advice strong {font-size:12px;color:#ffe2a0}.balance-advice p {margin:4px 0 0;font-size:10px;line-height:1.5;color:#d5d3b5}.balance-advice .tiny-btn {white-space:nowrap}
-.craft-slot-icon {font-size:33px;line-height:1.2;filter:drop-shadow(0 2px 4px #000a)}
-.craft-actions {display:flex;gap:6px;width:100%}.craft-actions .purchase-button {flex:1;min-width:0;font-size:10px}
-.secondary-buy {background:linear-gradient(#60706a,#374b52);border-color:#718e91}
-.gear-row.uncommon {border-color:#7aaa80}.gear-row.rare {border-color:#75aaca}.gear-row.epic {border-color:#c496db}.gear-row.legendary {border-color:#e5b960;background:linear-gradient(115deg,#685639,#333b2b)}
-.gear-detail {flex:1;min-width:120px}.gear-detail strong {display:block;font-size:12px;color:#fff1cb}.gear-detail small {font-size:10px;color:#bacbb0}
-.gear-actions {display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.empty-slot {padding:22px;text-align:center;border:3px dashed #647b64;color:#c5c6aa;font-size:12px}
-.feature-icon {font-size:45px;width:65px;text-align:center;text-shadow:0 3px 5px #0009;flex-shrink:0}
-.special-card {border-color:#a17a77;background:linear-gradient(110deg,#5e4948,#343632)}
-.prestige-emblem {font-size:72px;color:#f6e2a2;text-shadow:0 2px 15px #e0b34d77}
-.prestige-perks .craft-slot {min-height:215px}
-@media (max-width:1200px) {
-  .banner-right {font-size:8px;right:13px}}
-@media (max-width:790px) {
-  .banner-wordmark strong {font-size:30px}}
-@media (max-width:790px) {.banner-wordmark small {font-size:7px;letter-spacing:2px}}
-@media (max-width:790px) {
-  .banner-right {display:none}}
-@media (max-width:790px) {.banner-sigil {height:38px;width:38px;font-size:30px}}
-@media (max-width:790px) {
-  .helper-slot {height:42px}}
-@media (max-width:790px) {
-  .balance-advice {flex-wrap:wrap}}
-@media (max-width:790px) {.balance-advice .tiny-btn {width:100%}}
-@media (max-width:790px) {.tutorial-controls button {font-size:9px;padding:7px 8px}}
-@media (max-width:480px) {.banner-sigil {display:none}}
-@media (max-width:480px) {.banner-wordmark strong {font-size:28px}}
-@media (max-width:480px) {
-  .helper-slot {height:37px;padding:3px}}
-@media (max-width:480px) {.helper-slot-icon {height:25px;flex-basis:25px;font-size:16px}}
-@media (max-width:480px) {.helper-slot strong {font-size:9px}}
-@media (max-width:480px) {.helper-slot small {font-size:7px}}
-@media (max-width:480px) {.craft-actions {flex-direction:column;gap:3px}}
-@media (max-width:480px) {.gear-actions {width:100%;justify-content:stretch}}
-@media (max-width:480px) {.gear-actions button {flex:1}}
-@media (max-width:480px) {.feature-icon {font-size:33px;width:40px}}
-@media (max-width:480px) {.prestige-emblem {font-size:50px}}
-.shop-heading {align-items:center;margin-bottom:10px}
-.test-tools-actions {display:flex;flex-direction:column;gap:10px;margin:15px 0}
-.test-tools-actions button {width:100%;min-height:45px}
-.test-tools-note {font-size:11px;color:#b5c2ad;line-height:1.8}
-.account-top-button.signed-in {background:linear-gradient(#7e8552,#40573c)}
-.account-head {display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #708169;padding-bottom:12px;margin-bottom:16px}
-.account-head small {font-size:9px;color:#d6bf89;letter-spacing:1.8px;font-weight:900}
-.account-head h2 {margin:5px 0 0;font-size:23px;color:#fff2bf}
-.account-head>button {border:1px solid #809079;background:#344835;color:#e8eaca;border-radius:3px;padding:5px 10px;font-weight:900}
-.account-mode-tabs {display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:16px}
-.account-mode-tabs button {border:1px solid var(--border-subtle);background:#293b2f;color:#adbea7;padding:10px;font-size:12px;font-weight:900}
-.account-mode-tabs button.on {border-color:#dec68c;background:#74673f;color:#fff2c0}
-.account-error {min-height:15px;color:#ffc5b5;font-size:11px;line-height:1.6;margin:7px 0}
-.account-footnote {font-size:10px;color:#acbda6;line-height:1.9;text-align:center;margin:17px 0 0}
-.account-profile-card {border:1px solid var(--border-subtle);background:radial-gradient(ellipse at top,#566842,#273d2e);padding:18px}
-.account-profile-card>span {color:#f4dc94;font-size:10px;font-weight:900}
-.account-profile-card h3 {font-size:23px;margin:6px 0;color:#fff3c7}
-.account-profile-card p {color:#c6d6b9;font-size:11px}
-.account-profile-card>div {display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #718260;padding-top:12px;margin-top:14px;font-size:12px}
-.account-profile-card strong {font-size:18px;color:#ffdfa0}
-.account-actions {display:flex;gap:10px;margin-top:18px}
-.account-actions button {flex:1;border:1px solid var(--border-subtle);background:#817043;color:#fff4cc;padding:11px 7px;font-size:11px;font-weight:900}
-.account-actions button.muted {background:#34483a;border-color:#72866d}
-.leaderboard-shell {max-width:920px;margin:4px auto 26px;color:#e8e8cb}
-.leaderboard-refresh {flex-shrink:0;border:1px solid var(--border-subtle);background:#675b3b;color:#ffebbb;font-size:11px;font-weight:900;padding:11px}
-.leaderboard-my-rank {display:flex;align-items:center;flex-wrap:wrap;gap:12px;background:#364c38;border:2px solid #9e995b;margin:14px 0;padding:12px 17px;font-size:12px;color:#e4dfae}
-.leaderboard-my-rank strong {font-size:18px;color:#ffda77}
-.leaderboard-my-rank span {margin-left:auto;color:#d2dec9;font-size:11px}
-.attack-button.attack-queued {filter:brightness(1.18);box-shadow:0 0 0 2px #f9e7ae,0 0 18px #e4b97475}
-.leaderboard-my-rank.guest {justify-content:space-between}
-.leaderboard-my-rank.guest span {margin-left:0}
-.leaderboard-my-rank button {background:#d0b77a;border:1px solid #f1da9b;color:#2c392a;padding:8px 12px;font-weight:900;font-size:11px}
-.board-rank {font-weight:900;color:#bdc9b2;font-size:12px}
-.board-rank.top-rank {font-size:20px}
-.board-name {font-weight:900;color:#f1e9c8;min-width:0;overflow-wrap:anywhere}
-.board-name small {margin-left:9px;background:#d6bc74;padding:2px 6px;border-radius:3px;color:#303a28;font-size:9px}
-.board-level {font-size:11px;color:#a9c7aa}
-.board-power {font-size:15px;text-align:right;font-variant-numeric:tabular-nums;color:#ffdd92}
-.leaderboard-loading,
-.leaderboard-empty {padding:30px 16px;color:#c0d1bb;font-size:12px;text-align:center}
-.chapter-browser {padding:0 0 30px;color:#e6e9ce}
-.chapter-pick-icon {font-size:23px;width:29px;text-align:center;flex-shrink:0}
-.chapter-browser-detail {min-width:0}
-.chapter-detail-progress {font-size:10px;font-weight:900;color:#efda9c}
-.chapter-mission-card.cleared {background:#344a37}
-.chapter-mission-top {display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:9px;color:#d1d9c0}
-.chapter-mission-num {font-weight:900;color:#f7d48e}
-.chapter-mission-state {color:#cbd8bf}
-@media (max-width:550px) {.chapter-pick-icon {font-size:18px;width:20px}}
-@media (max-width:790px) {
-  .board-power {font-size:12px}}
-@media (max-width:480px) {
-  .leaderboard-refresh {padding:6px 9px}}
-@media (max-width:480px) {
-  .board-name {font-size:11px}}
-@media (max-width:480px) {.board-level {font-size:9px}}
-@media (max-width:480px) {.board-power {font-size:11px}}
-@media (max-width:480px) {
-  .leaderboard-my-rank span {margin-left:0}}@keyframes growthBurst {0%,35%{box-shadow:0 0 30px 8px #f2d17599;border-color:#ffefb0}100%{box-shadow:0 0 0 #f2d17500}}
-@keyframes tutorialPulse {50%{outline-color:#fff8d5;box-shadow:0 0 0 10px #e0b85a35,0 0 30px #fff0a8c4}}
-
-/* Shared modern surface treatment for inherited dialogs and side features. */
-.account-head, .account-profile-card, .account-error, .leaderboard-shell,
-.leaderboard-my-rank, .story-incident, .story-locked, .story-weapon,
-.story-epilogue, .chronicle-era, .balance-advice, .test-tools-note {
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-  box-shadow: none;
-}
-.chronicle-era.reached { border-color: var(--era-tint); }
-.account-head, .leaderboard-shell, .story-incident, .story-weapon,
-.story-epilogue, .test-tools-note { color: var(--text-main); }
-.chapter-browser-detail { min-width: 0; }
