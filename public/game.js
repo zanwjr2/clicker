@@ -202,7 +202,7 @@
     chestsOpened: 'runChestsOpened', moduleResearch: 'runModuleResearch', caravanCount: 'runCaravanCount' };
   const TUTORIAL_VERSION = 1;
   const TUTORIAL_STEPS = [
-    { icon: '🪓', title: '첫 공격', text: '먼저 「선택한 미션 시작」을 누른 뒤 석제 도끼로 세 번 공격하세요. 미션 선택은 무료이고 실제 시작할 때만 스태미너가 차감됩니다. Space 키로도 공격할 수 있어요.', tab: 'battle', target: '[data-action="startMission"]', metric: 'runClicks', count: 3, progressLabel: '공격' },
+    { icon: '🪓', title: '첫 공격', text: '「선택한 미션 시작」을 누른 뒤 석제 도끼로 세 번 공격하세요. 클리어한 미션의 재선택은 무료이고 실제 전투 시작에만 스태미너가 차감됩니다. Space 키로도 공격할 수 있어요.', tab: 'battle', target: '[data-action="startMission"]', metric: 'runClicks', count: 3, progressLabel: '공격' },
     { icon: GOLD_ICON, title: '채집과 스태미너', text: '채집으로 금화를 모아 보세요. 미션 시작 시 스태미너가 한 번 차감되고, 기본 90초마다 1씩 회복돼요. 레벨마다 최대치가 2 증가합니다.', tab: 'battle', target: '[data-action="gather"]', metric: 'tutorialGathers', count: 1, progressLabel: '채집' },
     { icon: '🔧', title: '상점 이용', text: '상점 · 장비 강화에서 추천·전투·스태미너·자원 분류를 골라 원하는 강화를 구매하세요.', tab: 'shop', target: '[data-buy="blade"]', metric: 'runPurchases', count: 1, progressLabel: '강화 구매' },
     { icon: '🎁', title: '첫 전리품', text: '장비·상자 탭에서 시작 보급상자를 열어 장비를 획득하세요. 얻은 장비는 자동 장착할 수 있어요.', tab: 'inventory', target: '[data-chest="bronze"]', metric: 'runChestsOpened', count: 1, progressLabel: '상자 개봉' },
@@ -567,7 +567,6 @@
           s.awaitingNext === previous.awaitingNext && s.battleOver === previous.battleOver &&
           !s.tutorial.active) renderFastCombat();
         else render();
-        saveStatus('🔒 서버 전투·보상 판정 완료');
         if (!previous.awaitingNext && s.awaitingNext)
           openModal('victory', victoryContent(s.lastVictory));
         else if (!previous.battleOver && s.battleOver)
@@ -580,7 +579,6 @@
         }
         if (type === 'selectMission') {
           closeModal(); navigate('battle');
-          toast('미션 선택 완료 · 스태미너 소모 0 · 시작할 때만 차감', true);
         }
         if (type === 'startMission') toast('⚔ 작전 개시! 스태미너가 한 번 차감됐습니다.', true);
         if (type === 'retry') closeModal();
@@ -952,6 +950,7 @@
     if (!Number.isSafeInteger(target) || target < 0 || target >= CHAPTERS.length * MISSIONS_PER_CHAPTER) {
       toast('존재하지 않는 미션입니다.'); return;
     }
+    if (target !== s.progress && !wasCleared(target)) return;
     if (s.awaitingNext) { openModal('victory', victoryContent(s.lastVictory)); return; }
     if (serverReady && (serverActionsPending || serverSaving)) { toast('서버 전투 판정이 끝난 후 선택해 주세요.'); return; }
     if (target === activeStage()) {
@@ -974,7 +973,6 @@
     s.missionEntered = false; s.timerStarted = false; s.timer = speedLimit();
     helperRemainder = 0; enemyAttackRemainder = 0; timerRemainder = 0;
     closeModal(); persist(); navigate('battle');
-    toast('미션 선택 완료 · 스태미너 소모 0 · 시작할 때만 차감', true);
   }
   function retry() { s.enemyHp = missionMax(); s.playerHp = maxHp(); s.battleOver = false; s.timer = speedLimit(); s.timerStarted = false; s.missionEntered = false; closeModal(); persist(); render(); }
   function chapterTitle() { return chapterIndex() < CHAPTERS.length ? chapter().name : '성간 개척 · 제' + (chapterIndex() - CHAPTERS.length + 2) + '성계'; }
@@ -1065,13 +1063,14 @@
     $('chapterReward').textContent = '보스 추가 금화 ' + fmt(Math.floor(600 * Math.pow(BALANCE.chapterGold, c) * goldMulti())) + ' · 유물 ' + (1 + (chapterRule().shard || 0)) + '개';
     $('chapterTrait').textContent = '✧ ' + chapterRule().name + ' · ' + chapterRule().detail;
     $('chapterStory').innerHTML = `<span>${ep.scene} 챕터 스토리</span><strong>${ep.prologue}</strong><small>${t.age} 이야기 읽기 ↗</small>`;
-    const missionSignature = c + ':' + i + ':' + s.progress + ':' + s.awaitingNext + ':' + s.selectedMission;
+    const missionSignature = c + ':' + i + ':' + s.progress + ':' + s.awaitingNext + ':' + s.selectedMission + ':' + s.clearedMissions.length;
     if ($('missionList').dataset.signature !== missionSignature) {
       $('missionList').innerHTML = MISSION_TYPES.map((m, index) => {
         const target = c * MISSIONS_PER_CHAPTER + index;
         const completed = wasCleared(target);
         const active = target === activeStage();
-        return `<button class="mission-item ${completed ? 'complete' : ''} ${active ? 'active' : ''} ${index === 9 ? 'boss-mission' : ''}" data-select-mission="${target}" title="${completed ? '재도전 · 보상 25%' : '자유 선택 가능 · 입장 무료'} · ${m.role}"><span class="mission-index">${index === 9 ? '♛' : String(index + 1).padStart(2, '0')}</span><span class="mission-copy"><strong>${ep.missions[index][0]}</strong><small>${index === 9 ? 'BOSS · 챕터 결전' : m.tag + ' · ' + m.role.split(' · ')[0]}</small></span><span class="mission-mark">${active ? '◉' : completed ? '✔' : '↗'}</span></button>`;
+        if (!completed) return `<button class="mission-item locked ${active ? 'active' : ''} ${index === 9 ? 'boss-mission' : ''}" disabled title="아직 클리어하지 않은 미션"><span class="mission-index">${index === 9 ? '♛' : String(index + 1).padStart(2, '0')}</span><span class="mission-copy"><strong>미발견 미션</strong><small>${active ? '현재 진행 중 · 전투 화면에서 도전' : '클리어 후 정보 공개'}</small></span><span class="mission-mark">🔒</span></button>`;
+        return `<button class="mission-item complete ${active ? 'active' : ''} ${index === 9 ? 'boss-mission' : ''}" data-select-mission="${target}" title="재도전 · 보상 25% · ${m.role}"><span class="mission-index">${index === 9 ? '♛' : String(index + 1).padStart(2, '0')}</span><span class="mission-copy"><strong>${ep.missions[index][0]}</strong><small>${index === 9 ? 'BOSS · 챕터 결전' : m.tag + ' · ' + m.role.split(' · ')[0]}</small></span><span class="mission-mark">${active ? '◉' : '✔'}</span></button>`;
       }).join('');
       $('missionList').dataset.signature = missionSignature;
     }
@@ -1139,9 +1138,10 @@
       const cleared = wasCleared(stage);
       const focused = stage === activeStage();
       const boss = index === MISSIONS_PER_CHAPTER - 1;
-      return `<article class="chapter-mission-card ${boss ? 'boss' : ''} ${cleared ? 'cleared' : ''} ${focused ? 'focused' : ''}"><div class="chapter-mission-top"><span class="chapter-mission-num">${boss ? '♛ BOSS' : String(index + 1).padStart(2, '0')}</span><span class="chapter-mission-state">${focused ? '● 선택 중' : cleared ? '✓ 클리어' : '● 자유 도전'}</span></div><h3>${story[0]}</h3><small>${boss ? '챕터 최종 보스전' : MISSION_TYPES[index].type + ' · ' + MISSION_TYPES[index].tag}</small><p>${story[1]}</p><button type="button" data-select-mission="${stage}">${focused ? '전투 화면으로 →' : cleared ? '↻ 재도전 · 보상 25%' : '⚔ 무료로 미션 선택 →'}</button></article>`;
+      if (!cleared) return `<article class="chapter-mission-card locked ${boss ? 'boss' : ''}"><div class="chapter-mission-top"><span class="chapter-mission-num">${boss ? '♛ BOSS' : String(index + 1).padStart(2, '0')}</span><span class="chapter-mission-state">🔒 미클리어</span></div><h3>🔒 미발견 미션</h3><small>임무 정보 비공개</small><p>${focused ? '현재 도전할 미션입니다. 전투 화면에서 진행하세요.' : '이 미션을 클리어하면 이름과 이야기가 공개됩니다.'}</p><button type="button" disabled>클리어 후 선택 가능</button></article>`;
+      return `<article class="chapter-mission-card ${boss ? 'boss' : ''} cleared ${focused ? 'focused' : ''}"><div class="chapter-mission-top"><span class="chapter-mission-num">${boss ? '♛ BOSS' : String(index + 1).padStart(2, '0')}</span><span class="chapter-mission-state">${focused ? '● 선택 중' : '✓ 클리어'}</span></div><h3>${story[0]}</h3><small>${boss ? '챕터 최종 보스전' : MISSION_TYPES[index].type + ' · ' + MISSION_TYPES[index].tag}</small><p>${story[1]}</p><button type="button" data-select-mission="${stage}">${focused ? '전투 화면으로 →' : '↻ 재도전 · 보상 25%'}</button></article>`;
     }).join('');
-    $('secondaryView').innerHTML = `<section class="chapter-browser secondary"><div class="chapter-browser-summary"><div><span class="section-label">EXPEDITION MAP / 문명의 연대기</span><h2>챕터 · 미션 선택</h2><p>원시 시대부터 우주 개척까지 · 14개 챕터 · 140개 미션 전체 자유 선택</p></div><strong>${totalFinished}<small> / 140 완료</small></strong></div><div class="chapter-browser-layout"><nav class="chapter-picker" aria-label="챕터 목록">${chapterButtons}</nav><div class="chapter-browser-detail"><div class="chapter-detail-hero"><span class="chapter-detail-scene">${selected.scene}</span><div><small>CHAPTER ${String(ch + 1).padStart(2, '0')} · ${selected.period}</small><h2>${selected.name}</h2><p>${selected.prologue}</p><span class="chapter-detail-progress">${finished} / 10 미션 클리어 · ${finished === 10 ? '챕터 완료 ✓' : '자유 도전 가능'}</span></div></div><div class="chapter-browser-guide">⚔ 어떤 챕터의 미션이든 무료로 선택할 수 있습니다. <b>전투 화면의 '미션 시작' 버튼을 눌렀을 때만</b> 스태미너가 한 번 소모됩니다.<br>↻ 이미 클리어한 미션은 금화·경험치 25%와 마력 1만 획득하며 보스 유물·장비·열쇠는 중복 지급되지 않습니다. 처음 클리어한 임무는 별도로 기록됩니다.</div><div class="chapter-mission-grid">${missionCards}</div></div></div></section>`;
+    $('secondaryView').innerHTML = `<section class="chapter-browser secondary"><div class="chapter-browser-summary"><div><span class="section-label">EXPEDITION MAP / 문명의 연대기</span><h2>챕터 · 미션 선택</h2><p>원시 시대부터 우주 개척까지 · 14개 챕터 · 140개 미션</p></div><strong>${totalFinished}<small> / 140 완료</small></strong></div><div class="chapter-browser-layout"><nav class="chapter-picker" aria-label="챕터 목록">${chapterButtons}</nav><div class="chapter-browser-detail"><div class="chapter-detail-hero"><span class="chapter-detail-scene">${selected.scene}</span><div><small>CHAPTER ${String(ch + 1).padStart(2, '0')} · ${selected.period}</small><h2>${selected.name}</h2><p>${selected.prologue}</p><span class="chapter-detail-progress">${finished} / 10 미션 클리어 · ${finished === 10 ? '챕터 완료 ✓' : '미완료 미션 잠금'}</span></div></div><div class="chapter-browser-guide">🔒 <b>클리어하지 않은 미션은 이름과 정보가 숨겨지고 선택할 수 없습니다.</b> 처음 진행하는 미션은 <b>전투 화면</b>에서 도전하세요.<br>↻ 클리어한 미션의 재선택은 무료이며 전투를 시작할 때만 스태미너가 소모됩니다. 재도전 금화·경험치는 25%이고 보스 유물은 중복 지급되지 않습니다.</div><div class="chapter-mission-grid">${missionCards}</div></div></div></section>`;
   }
   function renderShop() {
     const hitsPerSecond = (attack() + dps()) * armorReduction();
@@ -1325,7 +1325,7 @@
       const titles = { chapters: ['챕터 · 미션 선택', 'CHAPTERS / MISSION SELECT'], shop: ['상점 · 장비 강화', 'SHOP / UPGRADES'], helpers: ['동료 관리', 'EXPEDITION / CREW'], inventory: ['장비와 보급상자', 'INVENTORY / LOOT'], modules: ['기술 연구소', 'TECHNOLOGY / CHRONICLE'], quests: ['임무와 업적', 'MISSIONS / ACHIEVEMENTS'], arena: ['모의 투기장', 'ARENA / SIMULATION'], expedition: ['특수 작전과 파견', 'SPECIAL / CARAVANS'], prestige: ['프레스티지 계승', 'ASCENSION / LEGACY'], codex: ['탐사 도감', 'ARCHIVE / DISCOVERIES'], leaderboard: ['전투력 리더보드', 'GLOBAL / HALL OF EXPLORERS'] };
       const [title, eyebrow] = titles[activeTab];
       $('pageEyebrow').textContent = eyebrow; $('pageTitle').textContent = title;
-      $('pageSubtitle').textContent = activeTab === 'chapters' ? '140개 미션을 제한 없이 선택하세요. 선택은 무료이며 시작 시 스태미너가 소모됩니다.' : activeTab === 'shop' ? '금화로 전투력과 스태미너를 강화하세요.' : activeTab === 'leaderboard' ? '최고 전투력을 겨루는 탐사자들의 기록입니다.' : '탐사단을 성장시켜 더 강한 적과 새로운 지역에 도전하세요.';
+      $('pageSubtitle').textContent = activeTab === 'chapters' ? '미션은 클리어하면 정보가 공개됩니다. 완료한 미션만 무료로 재선택할 수 있습니다.' : activeTab === 'shop' ? '금화로 전투력과 스태미너를 강화하세요.' : activeTab === 'leaderboard' ? '최고 전투력을 겨루는 탐사자들의 기록입니다.' : '탐사단을 성장시켜 더 강한 적과 새로운 지역에 도전하세요.';
       $('missionBadge').innerHTML = 'LV. ' + s.level + ' <span>● 활동 중</span>';
       if (activeTab === 'leaderboard') {
         if (window.ERA_ACCOUNT_UI) window.ERA_ACCOUNT_UI.renderLeaderboard($('secondaryView'));
@@ -1370,7 +1370,7 @@
     if (serverDirty || serverBlocked || serverSaving) { toast('저장이 완료되지 않아 모드를 전환하지 않았습니다.'); return; }
     window.location.assign(enter ? '/play.html?mode=admin' : '/play.html');
   }
-  function helpModal() { openModal('help', `<span class="modal-crest">📖</span><div class="modal-overline">HOW TO PLAY</div><h2>문명 개척 가이드</h2><p style="text-align:left">① <b>챕터 · 미션 선택</b>에서 140개 미션 중 원하는 미션을 무료로 고릅니다. 순서 제한은 없습니다.<br>② <b>선택한 미션 시작</b> 버튼을 누르는 순간에만 스태미너가 한 번 차감됩니다. 이후 시대별 무기 버튼으로 공격합니다. (Space)<br>③ 스태미너는 기본 90초마다 1 회복되며, 새 전투를 시작할 때는 다시 입장 비용이 발생합니다.<br>④ <b>상점 · 장비 강화</b>에서 회복 체계와 행군 효율을 구매하거나 금화로 야영 보급을 사용할 수 있습니다.<br>⑤ 매 레벨업마다 최대 스태미너 +2, 공격력 +2, 최대 체력 +10이 적용됩니다.<br>⑥ 모든 미션에는 사건과 <b>클리어 후 공개되는 일러스트·결말</b>이 있으며 최초 클리어를 개별 기록합니다.<br>⑦ <b>기술 연구</b>는 시간이 지나 완료되고 프레스티지 후에도 유지됩니다.<br>⑧ 나머지 기능은 상단 <b>더보기</b>에서 찾을 수 있습니다. 상점의 일반 강화는 프레스티지 시 초기화됩니다.<br>⑨ 서버 저장에 연결되지 않으면 브라우저에 백업됩니다.</p><div class="modal-actions"><button class="modal-secondary" data-action="restartTutorial">🎓 직접 따라하기</button><button data-action="close">확인</button></div>`); }
+  function helpModal() { openModal('help', `<span class="modal-crest">📖</span><div class="modal-overline">HOW TO PLAY</div><h2>문명 개척 가이드</h2><p style="text-align:left">① <b>전투 화면</b>에서 현재 미션을 차례대로 진행합니다. 아직 클리어하지 않은 미션의 정보와 목록 선택은 잠겨 있습니다.<br>② <b>챕터 · 미션 선택</b>에서는 클리어한 미션만 무료로 다시 선택할 수 있습니다.<br>③ <b>선택한 미션 시작</b> 버튼을 누르는 순간에만 스태미너가 한 번 차감됩니다. 이후 시대별 무기로 공격합니다. (Space)<br>④ 스태미너는 기본 90초마다 1 회복되며 새 전투 시작에 입장 비용이 다시 발생합니다.<br>⑤ <b>상점 · 장비 강화</b>에서 회복·효율을 강화하거나 금화로 야영 보급을 이용할 수 있습니다.<br>⑥ 레벨업마다 최대 스태미너 +2, 공격력 +2, 최대 체력 +10이 적용됩니다.<br>⑦ 모든 미션에는 <b>클리어 후 공개되는 일러스트·결말</b>이 있으며 최초 클리어를 개별 기록합니다.<br>⑧ <b>기술 연구</b>는 시간이 지나 완료되고 프레스티지 후에도 유지됩니다.<br>⑨ 나머지 기능은 상단 <b>더보기</b>에서 찾을 수 있습니다. 저장 오류는 별도로 알려드립니다.</p><div class="modal-actions"><button class="modal-secondary" data-action="restartTutorial">🎓 직접 따라하기</button><button data-action="close">확인</button></div>`); }
   function resetConfirm() { openModal('reset', `<span class="modal-crest">⚠️</span><h2>${adminMode ? '테스트 데이터' : '내 계정'} 초기화</h2><p>${adminMode ? '관리자 테스트 저장 데이터만' : '일반 계정의 레벨, 재화, 장비, 미션과 리더보드 전투력까지'} 초기화됩니다.<br>복구할 수 없습니다. 정말 초기화할까요?</p><div class="modal-actions"><button class="modal-secondary" data-action="testTools">취소</button><button class="modal-danger-btn" data-action="reset">초기화 확인</button></div>`); }
   async function resetProgress() {
     if (serverActionsPending || serverSaving) { toast('진행 중인 서버 작업이 끝난 후 초기화해 주세요.'); return; }

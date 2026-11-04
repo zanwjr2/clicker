@@ -319,6 +319,10 @@ export function resolveServerAction(previous: Game, command: ServerAction, now =
     if (typeof choice !== "number" || !Number.isSafeInteger(choice) || choice < 0 ||
       choice >= 140)
       return { ok: false as const, code: "invalid-mission" };
+    // Browsing a chapter never grants access to its uncompleted missions.
+    // The contiguous frontier remains playable from the main battle view.
+    if (choice !== num(s.progress) && !s.clearedMissions.includes(choice))
+      return { ok: false as const, code: "mission-locked" };
     if (s.awaitingNext) return { ok: false as const, code: "victory-pending" };
     s.selectedMission = choice === num(s.progress) ? null : choice;
     s.enemyHp = maxEnemy(s); s.playerHp = stats().maxHp;

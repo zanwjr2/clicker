@@ -284,17 +284,6 @@ body {
   gap: 8px;
 }
 
-.save-indicator {
-  white-space: nowrap;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent-green-soft);
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-}
-
 .test-tools-button,
 .account-top-button {
   flex-shrink: 0;
@@ -854,6 +843,16 @@ body {
 .mission-item.boss-mission .mission-index {
   color: var(--accent-gold-soft);
 }
+
+.mission-item.locked {
+  opacity: 0.66;
+  background: var(--bg-elevated);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+.mission-item.locked strong,
+.mission-item.locked .mission-mark { color: var(--text-muted); }
+.mission-item.locked.boss-mission { border-color: var(--border-subtle); }
 
 .helper-slots {
   padding: 0 12px;
@@ -2810,8 +2809,14 @@ body {
 }
 
 .chapter-mission-card.locked {
-  opacity: 0.55;
+  opacity: 0.72;
+  background: var(--bg-elevated);
+  border-style: dashed;
 }
+.chapter-mission-card.locked h3 { color: var(--text-muted); }
+.chapter-mission-card.locked p { color: var(--text-muted); }
+.chapter-mission-card.locked button:disabled { cursor: not-allowed; opacity: 0.6; }
+.chapter-mission-card.locked.boss { border-color: var(--border-subtle); background: var(--bg-elevated); }
 
 .chapter-mission-card.boss {
   border-color: rgba(245, 158, 11, 0.42);
@@ -4232,7 +4237,6 @@ body {
   }
 
   .topbar .top-resource:nth-child(4),
-  .save-indicator,
   .test-tools-button span,
   .brand-overline {
     display: none;

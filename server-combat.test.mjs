@@ -251,11 +251,12 @@ test('a burst stops at the victory boundary without granting extra attacks or re
   assert.match(browser.view('modalRoot'), /이번 임무의 결말/);
 });
 
-test('all 140 missions are selectable for free and stage selection remains server-owned', () => {
+test('only cleared missions or the current frontier can be selected, with no stamina cost', () => {
   const base = starter();
   base.progress = 20;
   base.enemyHp = 609;
-  assert.equal(resolveServerAction(base, {type:'selectMission', id:21}, NOW).ok, true);
+  assert.equal(resolveServerAction(base, {type:'selectMission', id:21}, NOW).code, 'mission-locked');
+  assert.equal(resolveServerAction(base, {type:'selectMission', id:139}, NOW).code, 'mission-locked');
   assert.equal(resolveServerAction(base, {type:'selectMission', id:140}, NOW).ok, false);
   assert.equal(resolveServerAction(base, {type:'selectMission', id:'9'}, NOW).ok, false);
   assert.equal(hasServerOwnedChanges(base, {...base, selectedMission:9}), true,
@@ -273,9 +274,11 @@ test('all 140 missions are selectable for free and stage selection remains serve
   assert.equal(returned.enemyHp, 609);
 });
 
-test('stamina is paid once at explicit start, and nonsequential wins have a one-time clear record', () => {
+test('legacy nonsequential clears remain replayable, but only explicit starts pay stamina', () => {
   const base = starter();
   base.progress = 3;
+  base.clearedMissions = [0, 1, 2, 139]; // Already cleared in the previous build.
+  assert.equal(resolveServerAction(base, {type:'selectMission', id:138}, NOW).code, 'mission-locked');
   const chosen = doAction(base, 'selectMission', NOW, 139);
   assert.equal(chosen.stamina, base.stamina);
   assert.equal(chosen.selectedMission, 139);
@@ -292,10 +295,11 @@ test('stamina is paid once at explicit start, and nonsequential wins have a one-
 
   started.enemyHp = 1;
   const beaten = doAction(started, 'attack', NOW + 200);
-  assert.equal(beaten.lastVictory.replay, false);
+  assert.equal(beaten.lastVictory.replay, true);
   assert.ok(beaten.clearedMissions.includes(139));
   assert.equal(beaten.clearedMissions.filter(id => id === 139).length, 1);
-  assert.equal(beaten.progress, 3, 'clearing a future boss does not skip unfinished stages');
+  assert.equal(beaten.lastVictory.shard, 0, 'replaying an already cleared future boss cannot duplicate rewards');
+  assert.equal(beaten.progress, 3, 'old nonsequential history does not skip unfinished stages');
   const advanced = doAction(beaten, 'next', NOW + 300);
   assert.equal(advanced.progress, 3);
   assert.equal(advanced.selectedMission, null);
@@ -309,6 +313,13 @@ test('stamina is paid once at explicit start, and nonsequential wins have a one-
   assert.equal(replay.lastVictory.foundGear, null);
   assert.equal(replay.lastVictory.foundKey, false);
   assert.equal(replay.clearedMissions.filter(id => id === 139).length, 1);
+  const next = doAction(replay, 'next', NOW + 600);
+  next.enemyHp = 1;
+  const frontierWin = doAction(next, 'attack', NOW + 700);
+  assert.equal(frontierWin.lastVictory.replay, false);
+  assert.ok(frontierWin.clearedMissions.includes(3));
+  const frontierAdvance = doAction(frontierWin, 'next', NOW + 800);
+  assert.equal(frontierAdvance.progress, 4);
 });
 
 test('replayed chapter bosses pay reduced rewards, no repeat relic, and preserve unlocked stages', () => {
@@ -338,7 +349,8 @@ test('mission browser displays fourteen chapters, boss endings and selectable cl
   await browser.settle();
   browser.click('nav', 'chapters');
   assert.equal((browser.view('secondaryView').match(/data-browse-chapter=/g) || []).length, 14);
-  assert.equal((browser.view('secondaryView').match(/data-select-mission=/g) || []).length, 10);
+  assert.equal((browser.view('secondaryView').match(/data-select-mission=/g) || []).length, 0);
+  assert.match(browser.view('secondaryView'), /미발견 미션/);
   browser.click('browse-chapter', '0');
   assert.match(browser.view('secondaryView'), /맘모스의 골짜기/);
   assert.match(browser.view('secondaryView'), /BOSS/);
@@ -353,11 +365,15 @@ test('mission browser displays fourteen chapters, boss endings and selectable cl
   assert.equal(browser.serverState().clicks, 0, 'explicit start does not attack');
   browser.click('nav', 'chapters');
   browser.click('browse-chapter', '2');
-  browser.click('select-mission', '20');
+  assert.equal((browser.view('secondaryView').match(/data-select-mission=/g) || []).length, 0,
+    'even the current uncompleted stage is not offered as a selectable card');
+  assert.match(browser.view('secondaryView'), /disabled>클리어 후 선택 가능/);
+  browser.click('browse-chapter', '1');
+  browser.click('select-mission', '10');
   assert.match(browser.view('modalRoot'), /진행 중인 전투를 포기/);
   browser.click('action', 'confirmMissionSelect');
   await browser.settle();
-  assert.equal(browser.serverState().selectedMission, null);
+  assert.equal(browser.serverState().selectedMission, 10);
   assert.equal(browser.serverState().progress, 20);
   assert.equal(browser.serverState().missionEntered, false);
 });
