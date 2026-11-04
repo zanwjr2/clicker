@@ -15,46 +15,74 @@
 <body data-theme="evolution" data-era="0">
   <div id="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">✦</div><div><div class="brand-overline">CIVILIZATION CHRONICLE</div><div class="brand-name" id="brandName">ERA<span>BOUND</span></div></div></div>
-      <div class="header-season"><span class="live-dot"></span> <span id="worldLabel">CH.1 · 원시 시대</span><span class="season-tag">연대기 01</span></div>
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div>
+          <div class="brand-overline">CIVILIZATION CHRONICLE</div>
+          <div class="brand-name" id="brandName">ERA<span>BOUND</span></div>
+        </div>
+      </div>
+      <div class="header-season">
+        <span class="live-dot"></span>
+        <span id="worldLabel">CH.1 · 원시 시대</span>
+        <span class="season-tag">연대기 01</span>
+      </div>
       <div class="top-resources">
         <div class="top-resource top-stamina"><span>⚡</span><div><small>스태미너</small><strong id="staminaTop">72/72</strong></div></div>
         <div class="top-resource"><span class="gold-icon" aria-label="금화">G</span><div><small>금화</small><strong id="goldTop">500</strong></div></div>
         <div class="top-resource"><span>🔮</span><div><small>마력</small><strong id="essenceTop">0</strong></div></div>
         <div class="top-resource"><span>💎</span><div><small>유물</small><strong id="shardsTop">0</strong></div></div>
       </div>
-      <span class="save-indicator" id="saveIndicator">● 로컬 저장</span>
-      <button id="testToolsButton" class="test-tools-button" data-action="testTools" title="내 계정 초기화와 테스트 모드">⚙ <span>테스트 관리</span></button>
-      <button id="accountButton" class="account-top-button" data-account-action="open">👤 가입 · 로그인</button>
-      <button class="icon-button help-btn" data-action="help" title="도움말">?</button>
+      <div class="topbar-actions">
+        <span class="save-indicator" id="saveIndicator">● 로컬 저장</span>
+        <button id="testToolsButton" class="test-tools-button" data-action="testTools" title="내 계정 초기화와 테스트 모드">⚙ <span>테스트 관리</span></button>
+        <button id="accountButton" class="account-top-button" data-account-action="open">👤 가입 · 로그인</button>
+        <button class="icon-button help-btn" data-action="help" title="도움말">?</button>
+      </div>
     </header>
-    <div id="adminModeNotice" class="admin-mode-notice hidden" role="status">🛠 관리자 테스트 중 · 스태미너 ∞ · 일반 계정 및 리더보드와 분리 <button data-action="exitAdmin">일반 모드로 복귀</button></div>
+
+    <div id="adminModeNotice" class="admin-mode-notice hidden" role="status">
+      🛠 관리자 테스트 중 · 스태미너 ∞ · 일반 계정 및 리더보드와 분리
+      <button data-action="exitAdmin">일반 모드로 복귀</button>
+    </div>
 
     <div class="shell">
       <aside class="sidebar">
-        <div class="profile">
-          <div class="avatar">⚔️</div><div class="profile-copy"><small>탐사단 지휘관</small><strong>신입 탐사자</strong><span>LV.<b id="sideLevel">1</b> <i class="rank-dot"></i> <span id="rankText">견습</span></span></div>
-        </div>
-        <div class="level-track"><div class="level-fill" id="levelFill"></div></div><div class="xp-mini"><span>경험치</span><span id="xpMini">0 / 650</span></div>
-        <div class="nav-caption">빠른 메뉴</div>
-        <nav class="main-nav" id="nav">
-          <button class="nav-item selected" data-nav="battle"><span>⚔</span> 전투 <b>PLAY</b></button>
-          <button class="nav-item" data-nav="chapters"><span>🗺️</span> 챕터 · 미션 <b>140</b></button>
-          <button class="nav-item" data-nav="shop"><span>🛒</span> 상점 · 장비 강화 <span id="shopCount">18</span></button>
-          <button class="nav-item" data-nav="helpers"><span>♧</span> 동료</button>
-          <button class="nav-item" data-nav="modules"><span>🔬</span> 기술 연구</button>
-          <button class="nav-item" data-nav="leaderboard"><span>🏆</span> 리더보드 <b>RANK</b></button>
-          <button class="nav-item nav-more" id="moreNavToggle" data-action="toggleMoreNav" aria-expanded="false" aria-controls="moreNav"><span>☰</span> 더보기 <b>7개 기능</b></button>
-          <div class="more-nav hidden" id="moreNav">
-            <button class="nav-item" data-nav="inventory"><span>♢</span> 장비·상자</button>
-            <button class="nav-item" data-nav="quests"><span>✧</span> 임무·업적</button>
-            <button class="nav-item" data-nav="arena"><span>♜</span> 투기장</button>
-            <button class="nav-item" data-nav="expedition"><span>⌛</span> 특수 작전</button>
-            <button class="nav-item" data-nav="prestige"><span>♛</span> 프레스티지</button>
-            <button class="nav-item" data-nav="codex"><span>▣</span> 탐사 도감</button>
-            <button class="nav-item" data-action="settings"><span>⚙</span> 환경 설정</button>
+        <div class="sidebar-top">
+          <div class="profile">
+            <div class="avatar">⚔️</div>
+            <div class="profile-copy">
+              <small>탐사단 지휘관</small>
+              <strong>신입 탐사자</strong>
+              <span>LV.<b id="sideLevel">1</b> <i class="rank-dot"></i> <span id="rankText">견습</span></span>
+            </div>
+            <div class="xp-bar-wrap">
+              <div class="xp-mini"><span>EXP</span><span id="xpMini">0 / 650</span></div>
+              <div class="level-track"><div class="level-fill" id="levelFill"></div></div>
+            </div>
           </div>
-        </nav>
+
+          <div class="nav-caption">빠른 메뉴</div>
+          <nav class="main-nav" id="nav">
+            <button class="nav-item selected" data-nav="battle"><span>⚔</span> 전투 <b>PLAY</b></button>
+            <button class="nav-item" data-nav="chapters"><span>🗺️</span> 챕터 · 미션 <b>140</b></button>
+            <button class="nav-item" data-nav="shop"><span>🛒</span> 상점 · 강화 <span id="shopCount">18</span></button>
+            <button class="nav-item" data-nav="helpers"><span>♧</span> 동료</button>
+            <button class="nav-item" data-nav="modules"><span>🔬</span> 기술 연구</button>
+            <button class="nav-item" data-nav="leaderboard"><span>🏆</span> 리더보드 <b>RANK</b></button>
+            <button class="nav-item nav-more" id="moreNavToggle" data-action="toggleMoreNav" aria-expanded="false" aria-controls="moreNav"><span>☰</span> 더보기 <b>7</b></button>
+            <div class="more-nav hidden" id="moreNav">
+              <button class="nav-item" data-nav="inventory"><span>♢</span> 장비·상자</button>
+              <button class="nav-item" data-nav="quests"><span>✧</span> 임무·업적</button>
+              <button class="nav-item" data-nav="arena"><span>♜</span> 투기장</button>
+              <button class="nav-item" data-nav="expedition"><span>⌛</span> 특수 작전</button>
+              <button class="nav-item" data-nav="prestige"><span>♛</span> 프레스티지</button>
+              <button class="nav-item" data-nav="codex"><span>▣</span> 탐사 도감</button>
+              <button class="nav-item" data-action="settings"><span>⚙</span> 환경 설정</button>
+            </div>
+          </nav>
+        </div>
+
         <div class="side-bottom">
           <div class="expedition-tip"><span>✦ 문명 이야기</span><p>돌도끼 하나로 시작된 인류의 여정이 별까지 이어집니다.</p></div>
         </div>
@@ -63,50 +91,163 @@
       <main class="main-content">
         <div class="game-banner">
           <div class="banner-sigil">✥</div>
-            <div class="banner-wordmark"><small>FROM STONE TO STARS</small><strong id="retroBrand">ERABOUND</strong><span>THE LONG CHRONICLE <b>v3.4</b></span></div>
+          <div class="banner-wordmark"><small>FROM STONE TO STARS</small><strong id="retroBrand">ERABOUND</strong><span>THE LONG CHRONICLE <b>v3.4</b></span></div>
           <div class="banner-right"><span>◈ CLASSIC CLICK RPG ◈</span><small>터치 · 클릭 · 성장 · 탐사</small></div>
         </div>
-        <div class="page-title"><div><small id="pageEyebrow">CHAPTER 01 / OPERATION 01</small><h1 id="pageTitle">불의 새벽</h1><p id="pageSubtitle">돌도끼 하나로 시작하는 인류의 여정</p></div><div class="mission-badge" id="missionBadge">일반 임무 <span>● 진행 중</span></div></div>
+
+        <div class="page-title">
+          <div class="page-title-copy">
+            <small id="pageEyebrow">CHAPTER 01 / OPERATION 01</small>
+            <h1 id="pageTitle">불의 새벽</h1>
+            <p id="pageSubtitle">돌도끼 하나로 시작하는 인류의 여정</p>
+          </div>
+          <div class="mission-badge" id="missionBadge">일반 임무 <span>● 진행 중</span></div>
+        </div>
+
         <div id="battleView" class="view">
           <div class="battle-grid">
+            <!-- 좌측: 챕터 및 미션 경로 -->
             <section class="missions-panel panel">
               <div class="panel-head"><span>탐사 경로</span><small id="chapterProgress">0 / 10 완료</small></div>
-              <div class="helper-slots" id="leftHelperSlots"></div>
-              <div class="chapter-flag"><div class="chapter-icon">⌁</div><div><small>현재 챕터</small><strong id="chapterName">불을 지키는 사람들</strong></div><span id="chapterNum">01</span></div>
+              <div class="chapter-flag">
+                <div class="chapter-icon">⌁</div>
+                <div><small>현재 챕터</small><strong id="chapterName">불을 지키는 사람들</strong></div>
+                <span id="chapterNum">01</span>
+              </div>
               <div class="chapter-trait" id="chapterTrait">✧ 생존 본능 · 성장과 조작을 익히는 균형 구간</div>
-              <button type="button" class="chapter-story" id="chapterStory" data-action="chapterStory">🔥 챕터 스토리 보기</button>
-              <button type="button" class="chapter-map-link" data-nav="chapters">🗺️ 전체 챕터·미션 선택 →</button>
+              <div class="chapter-actions-row">
+                <button type="button" class="chapter-story" id="chapterStory" data-action="chapterStory">🔥 챕터 스토리</button>
+                <button type="button" class="chapter-map-link" data-nav="chapters">🗺️ 전체 챕터 · 미션</button>
+              </div>
               <div class="mission-list" id="missionList"></div>
+              <div class="helper-slots" id="leftHelperSlots"></div>
               <div class="reward-teaser"><span>♢</span><div><strong>챕터 정복 보상</strong><small id="chapterReward">추가 금화 600 · 유물 1개</small></div></div>
             </section>
 
+            <!-- 중앙: 전장 및 적 상태 -->
             <section class="battlefield panel" id="battlefield">
-              <div class="field-head"><span class="field-sector" id="fieldSector">CHAPTER 01 — PROLOGUE</span><span class="field-condition"><i></i> <span id="fieldCondition">적대 신호 감지</span></span></div>
-              <button class="mission-story-button" data-action="missionStory" id="missionStoryButton"><span>📜 <strong>미션 스토리</strong></span><small id="missionStoryPreview">이번 사건의 전말 읽기 →</small></button>
+              <div class="field-head">
+                <div class="field-head-left">
+                  <span class="field-sector" id="fieldSector">CHAPTER 01 — PROLOGUE</span>
+                  <span class="field-condition"><i></i> <span id="fieldCondition">적대 신호 감지</span></span>
+                </div>
+                <button class="mission-story-button" data-action="missionStory" id="missionStoryButton">
+                  <span>📜 <strong>미션 스토리</strong></span>
+                  <small id="missionStoryPreview">사건 전말 읽기</small>
+                </button>
+              </div>
+
+              <div class="combat-top-bar">
+                <div class="target-header">
+                  <div class="target-chip">
+                    <span>◉ TARGET</span>
+                    <strong id="enemyName">균열의 잔영</strong>
+                    <small id="enemyType">일반형 · 위협도 Ⅰ</small>
+                  </div>
+                  <div class="health-label">
+                    <span>♥ 적 생명력</span>
+                    <strong id="enemyHpText">320 / 320</strong>
+                  </div>
+                </div>
+                <div class="health-track"><div class="health-fill" id="enemyHpFill"></div></div>
+              </div>
+
               <div class="field-visual">
                 <div class="celestial-glow"></div>
                 <div class="era-scene-mark" id="eraSceneMark" aria-hidden="true">🌄</div>
                 <svg class="portal-art" viewBox="0 0 560 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="mountains" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#303957"/><stop offset="1" stop-color="#080d16"/></linearGradient><linearGradient id="arch" x1="0" x2="1"><stop stop-color="#27344a"/><stop offset=".5" stop-color="#50627a"/><stop offset="1" stop-color="#1b2738"/></linearGradient><radialGradient id="portal"><stop stop-color="#c3e7f5" stop-opacity=".86"/><stop offset=".3" stop-color="#76c8e4" stop-opacity=".67"/><stop offset=".7" stop-color="#8169bc" stop-opacity=".43"/><stop offset="1" stop-color="#27284e" stop-opacity="0"/></radialGradient></defs><path d="M0 260L85 165 142 232 220 144 310 256 403 147 472 222 560 154V460H0Z" fill="url(#mountains)" opacity=".7"/><path d="M0 320L135 239 215 300 310 246 444 290 560 228V460H0Z" fill="#10182a"/><ellipse cx="280" cy="253" rx="124" ry="152" fill="url(#portal)"/><path d="M164 356V194Q164 74 280 74Q396 74 396 194V356h-25V192Q371 99 280 99Q189 99 189 192v164Z" fill="url(#arch)" stroke="#5e7085" stroke-width="3"/><path d="M181 359V194Q181 86 280 86Q379 86 379 194V359" fill="none" stroke="#9bdce9" stroke-opacity=".55" stroke-width="2" stroke-dasharray="8 16"/><path d="M148 363h264l28 25H121Z" fill="#283449" stroke="#5d7083" stroke-width="4"/><path d="M120 387h320l35 35H86Z" fill="#192537"/><path d="M1 413L170 370 238 400 326 376 560 422V460H0Z" fill="#0b1220"/><g fill="#a6e9ef"><circle cx="121" cy="118" r="2"/><circle cx="443" cy="121" r="2"/><circle cx="392" cy="66" r="1.6"/><circle cx="177" cy="44" r="1.7"/><circle cx="306" cy="40" r="1"/></g></svg>
-                <div class="enemy-halo"></div><div id="enemySprite" class="enemy-sprite" aria-label="적 캐릭터">👁️</div>
-                <div class="ground-sigil"></div><div class="floating-texts" id="floatingTexts"></div>
+                <div class="enemy-halo"></div>
+                <div id="enemySprite" class="enemy-sprite" aria-label="적 캐릭터">👁️</div>
+                <div class="ground-sigil"></div>
+                <div class="floating-texts" id="floatingTexts"></div>
                 <div class="seal-caption">✦ FROM STONE TO STARS ✦</div>
-                <div class="target-chip"><span>◉ TARGET</span><strong id="enemyName">균열의 잔영</strong><small id="enemyType">일반형 · 위협도 Ⅰ</small></div>
               </div>
-              <div class="combat-bottom"><div class="health-label"><span>♥ 적 생명력</span><strong id="enemyHpText">320 / 320</strong></div><div class="health-track"><div class="health-fill" id="enemyHpFill"></div></div><div class="combat-meta"><span id="battleHint">클릭으로 적을 공격하세요</span><span id="missionTimer"></span></div><div class="mission-payout" id="missionPayout">예상 보상 · 금화 300 · XP 170</div></div>
+
+              <div class="combat-bottom">
+                <div class="combat-meta">
+                  <span id="battleHint">클릭으로 적을 공격하세요</span>
+                  <span id="missionTimer"></span>
+                </div>
+                <div class="mission-payout" id="missionPayout">예상 보상 · 금화 300 · XP 170</div>
+              </div>
             </section>
 
+            <!-- 우측: 전투 조작 및 캐릭터 상태 -->
             <section class="actions-panel">
-              <div class="stats-card panel"><div class="panel-head"><span>전투 현황</span><small class="online-chip">LIVE</small></div><div class="stat-main"><small>총 전투력</small><strong id="powerValue">10</strong><span>⚡ PWR</span></div><div class="mini-stats"><div><small>클릭 공격력</small><b id="dpcValue">10</b></div><div><small>초당 자동 피해</small><b id="dpsValue">0</b></div></div><div class="growth-card" id="growthCard"><strong>✦ 레벨 숙련 효과</strong><span id="growthBonus">공격 +0% · 최대 체력 +0</span><small id="growthNext">다음 성장 돌파 LV.5</small></div><div class="player-health"><span>탐사자 체력</span><strong id="playerHpText">120 / 120</strong></div><div class="player-health-bar"><div id="playerHpFill"></div></div></div>
-              <div class="buttons-card panel"><div class="panel-head"><span>전투 행동</span><small>SPACE 키로 공격</small></div><div class="stamina-panel"><div class="stamina-head"><span>⚡ 스태미너</span><strong id="staminaText">72 / 72</strong></div><div class="stamina-track"><div id="staminaFill"></div></div><small id="staminaInfo">미션 시작 시 -5 · 90초마다 +1 회복</small><button class="stamina-supply" data-action="campSupply" id="staminaSupply">🏕️ 야영 보급 · 스태미너 +22</button><button class="stamina-shop-link" data-action="shopStamina">⚡ 스태미너 강화 상점 →</button></div><button id="attackButton" class="attack-button" data-action="attack"><span class="attack-symbol" id="attackWeaponIcon">🪓</span><span><strong id="attackActionLabel">내리치기</strong><small id="attackWeaponName">석제 도끼</small></span><b id="attackDamage">+10</b></button><div class="sub-actions"><button data-action="heal"><span>✚</span><strong>치료</strong><small id="healVal">+12 HP</small></button><button data-action="gather"><span>◉</span><strong>채집</strong><small id="gatherVal">+12 금화</small></button></div><button class="skill-button" data-action="skill"><span>✦</span><span><strong>집중 공격</strong><small id="skillDetail">마력 25 소모 · 강력한 일격</small></span><kbd>Q</kbd></button></div>
+              <div class="buttons-card panel">
+                <div class="panel-head"><span>전투 행동</span><small>단축키 SPACE · H · G · Q</small></div>
+                <div class="combat-controls-body">
+                  <button id="attackButton" class="attack-button" data-action="attack">
+                    <span class="attack-symbol" id="attackWeaponIcon">🪓</span>
+                    <span class="attack-copy">
+                      <strong id="attackActionLabel">내리치기</strong>
+                      <small id="attackWeaponName">석제 도끼</small>
+                    </span>
+                    <b id="attackDamage">+10</b>
+                  </button>
+
+                  <div class="sub-actions">
+                    <button data-action="heal"><span>✚</span><div><strong>치료 <kbd>H</kbd></strong><small id="healVal">+12 HP</small></div></button>
+                    <button data-action="gather"><span>◉</span><div><strong>채집 <kbd>G</kbd></strong><small id="gatherVal">+12 금화</small></div></button>
+                  </div>
+
+                  <button class="skill-button" data-action="skill">
+                    <span>✦</span>
+                    <span><strong>집중 공격</strong><small id="skillDetail">마력 25 소모 · 강력한 일격</small></span>
+                    <kbd>Q</kbd>
+                  </button>
+
+                  <div class="stamina-panel">
+                    <div class="stamina-head"><span>⚡ 스태미너</span><strong id="staminaText">72 / 72</strong></div>
+                    <div class="stamina-track"><div id="staminaFill"></div></div>
+                    <small id="staminaInfo">미션 시작 시 -5 · 90초마다 +1 회복</small>
+                    <div class="stamina-actions">
+                      <button class="stamina-supply" data-action="campSupply" id="staminaSupply">🏕️ 야영 보급 +22</button>
+                      <button class="stamina-shop-link" data-action="shopStamina">⚡ 스태미너 상점 →</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stats-card panel">
+                <div class="panel-head"><span>탐사자 상태</span><small class="online-chip">LIVE</small></div>
+                <div class="player-health"><span>탐사자 체력</span><strong id="playerHpText">120 / 120</strong></div>
+                <div class="player-health-bar"><div id="playerHpFill"></div></div>
+                <div class="stats-summary-grid">
+                  <div class="stat-main"><small>총 전투력</small><strong id="powerValue">10</strong><span>⚡ PWR</span></div>
+                  <div class="mini-stats">
+                    <div><small>클릭 공격력</small><b id="dpcValue">10</b></div>
+                    <div><small>초당 자동 피해</small><b id="dpsValue">0</b></div>
+                  </div>
+                </div>
+                <div class="growth-card" id="growthCard">
+                  <strong>✦ 레벨 숙련 효과</strong>
+                  <span id="growthBonus">공격 +0% · 최대 체력 +0</span>
+                  <small id="growthNext">다음 성장 돌파 LV.5</small>
+                </div>
+              </div>
+
               <div class="quick-quest panel" id="quickQuest"></div>
             </section>
           </div>
-          <div class="bottom-status"><div><span class="status-icon">◈</span><span><strong id="statusTitle">탐사가 시작되었습니다</strong><small id="statusText">미션을 완료해 다음 지역을 해금하세요.</small></span></div><button data-nav="shop">🛒 상점 열기 <span>→</span></button></div>
+
+          <div class="bottom-status">
+            <div>
+              <span class="status-icon">◈</span>
+              <span>
+                <strong id="statusTitle">탐사가 시작되었습니다</strong>
+                <small id="statusText">미션을 완료해 다음 지역을 해금하세요.</small>
+              </span>
+            </div>
+            <button data-nav="shop">🛒 상점 열기 <span>→</span></button>
+          </div>
         </div>
+
         <div id="secondaryView" class="view hidden"></div>
         <footer class="footer">ERA BOUND © 2026 <span>·</span> 돌에서 별까지 <span>·</span> 계정별 서버 저장 및 브라우저 백업</footer>
       </main>
     </div>
+
     <div id="toastLayer" class="toast-layer"></div>
     <aside id="tutorialRoot" class="tutorial-root hidden" aria-label="초보자 튜토리얼" aria-live="polite"></aside>
     <div id="modalRoot" class="modal-root hidden" aria-live="polite"></div>
